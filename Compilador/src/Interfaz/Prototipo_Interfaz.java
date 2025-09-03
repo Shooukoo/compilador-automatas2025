@@ -36,7 +36,7 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
 
-        // ===== BARRA DE MENÚS =====
+        // BARRA DE MENÚS
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
 
@@ -48,7 +48,7 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         menuBar.add(crearMenu("Run", "Ejecutar", "Depurar"));
         menuBar.add(crearMenu("Help", "Documentación", "Acerca de"));
 
-        // ===== BARRA DE HERRAMIENTAS =====
+        // BARRA DE HERRAMIENTAS
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(false);
         contentPane.add(toolBar, BorderLayout.NORTH);
@@ -60,10 +60,9 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         toolBar.add(crearBoton("Ejecutar", "C:\\Users\\shoxd\\git\\repository\\Compilador\\src\\Interfaz\\Iconos\\jugar.png", "Run>Ejecutar"));
         toolBar.add(crearBoton("Depurar", "C:\\Users\\shoxd\\git\\repository\\Compilador\\src\\Interfaz\\Iconos\\depurar.png", "Run>Depurar"));
 
-        // ===== PANEL CENTRAL =====
+        //  PANEL CENTRAL
         tabbedPane = new JTabbedPane();
 
-        // Panel derecho fijo
         JPanel rightPanel = new JPanel(new GridLayout(2, 1, 5, 5));
         textLexico = new JTextArea("Resultados Analizador Léxico...");
         textLexico.setEditable(false);
@@ -78,7 +77,6 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         contentPane.add(mainSplit, BorderLayout.CENTER);
     }
 
-    // ===== MÉTODOS =====
     private JTextArea crearNuevoEditor() {
         JTextArea editor = new JTextArea();
         editor.setFont(new Font("Monospaced", Font.PLAIN, 14));
@@ -149,12 +147,10 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         tabbedPane.setSelectedComponent(scroll);
     }
 
-    // ===== ACTION PERFORMED =====
     @Override
     public void actionPerformed(ActionEvent e) {
         String comando = e.getActionCommand();
 
-        // Nuevo archivo no requiere editor activo
         if (comando.equals("Archivo>Nuevo")) {
             JTextArea nuevoEditor = crearNuevoEditor();
             int numero = tabbedPane.getTabCount() + 1;
@@ -162,7 +158,6 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
             return;
         }
 
-        // Obtener editor activo
         JTextArea editor = getEditorActivo();
         if (editor == null) {
             JOptionPane.showMessageDialog(this, "No hay ningún archivo abierto.", "Error", JOptionPane.ERROR_MESSAGE);

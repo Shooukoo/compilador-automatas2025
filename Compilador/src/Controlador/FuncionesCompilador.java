@@ -8,7 +8,6 @@ public class FuncionesCompilador {
 
     private static UndoManager undoManager = new UndoManager();
 
-    // Abrir archivo y devolver contenido
     public static String abrirArchivo(JFrame parent) {
         JFileChooser chooser = new JFileChooser();
         int resultado = chooser.showOpenDialog(parent);
@@ -25,7 +24,6 @@ public class FuncionesCompilador {
         return null;
     }
 
-    // Guardar archivo
     public static void guardarArchivo(JFrame parent, String contenido) {
         JFileChooser chooser = new JFileChooser();
         int resultado = chooser.showSaveDialog(parent);
@@ -40,28 +38,23 @@ public class FuncionesCompilador {
         }
     }
 
-    // Nuevo archivo
     public static void nuevoArchivo(JTextArea editor, JFrame frame) {
         editor.setText("");
         frame.setTitle("Prototipo Compilador - Nuevo archivo");
     }
 
-    // Analizador léxico
     public static String ejecutarAnalizadorLexico(String codigo) {
         return "Resultado análisis léxico de " + codigo.length() + " caracteres";
     }
 
-    // Analizador sintáctico
     public static String ejecutarAnalizadorSintactico(String codigo) {
         return "Estado de pila sintáctica simulado para " + codigo.length() + " caracteres";
     }
 
-    // Deshacer
     public static void deshacer() {
         if (undoManager.canUndo()) undoManager.undo();
     }
 
-    // Rehacer
     public static void rehacer() {
         if (undoManager.canRedo()) undoManager.redo();
     }
@@ -70,12 +63,10 @@ public class FuncionesCompilador {
         return undoManager;
     }
 
-    // Formatear código (simulación)
     public static String formatearCodigo(String codigo) {
-        return codigo.replaceAll(";", ";\n"); // ejemplo simple
+        return codigo.replaceAll(";", ";\n");
     }
 
-    // Comentar/Descomentar (simulación)
     public static String comentarDescomentar(String codigo) {
         if (codigo.startsWith("//")) {
             return codigo.replaceFirst("//", "");
@@ -84,7 +75,6 @@ public class FuncionesCompilador {
         }
     }
 
-    // Buscar texto
     public static void buscar(JTextArea editor, JFrame parent) {
         String busqueda = JOptionPane.showInputDialog(parent, "Buscar texto:");
         if (busqueda != null && !busqueda.isEmpty()) {
@@ -98,7 +88,6 @@ public class FuncionesCompilador {
         }
     }
 
-    // Reemplazar texto
     public static void reemplazar(JTextArea editor, JFrame parent) {
         String busqueda = JOptionPane.showInputDialog(parent, "Texto a buscar:");
         String reemplazo = JOptionPane.showInputDialog(parent, "Texto de reemplazo:");
@@ -107,23 +96,19 @@ public class FuncionesCompilador {
         }
     }
 
-    // Ejecutar programa (simulación)
     public static void ejecutar(String codigo, JTextArea areaSalida) {
         areaSalida.setText("Ejecutando programa...\nCódigo tiene " + codigo.length() + " caracteres");
     }
 
-    // Depurar programa (simulación)
     public static void depurar(String codigo, JTextArea areaSalida) {
         areaSalida.setText("Depurando programa...\nCódigo tiene " + codigo.length() + " caracteres");
     }
 
-    // Documentación
     public static void abrirDocumentacion(JFrame parent) {
         JOptionPane.showMessageDialog(parent, "Documentación del compilador v1.0");
     }
 
-    // Acerca de
     public static void acercaDe(JFrame parent) {
-        JOptionPane.showMessageDialog(parent, "Compilador v1.0\nDesarrollado por Ti");
+        JOptionPane.showMessageDialog(parent, "Compilador v1.0\nDesarrollado para la materia de Automatas");
     }
 }
