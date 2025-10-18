@@ -1,20 +1,21 @@
 package Interfaz;
 
 import Controlador.FuncionesCompilador;
-
+import Analizador.Token;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class Prototipo_Interfaz extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
     private JTabbedPane tabbedPane;
-    private JTextArea textLexico;
-    private JTextArea textSintactico;
+    private JTable tablaLexico;
+    private JTable tablaSintactico;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -39,40 +40,34 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         // BARRA DE MENÚS
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-
         menuBar.add(crearMenu("Archivo", "Nuevo", "Abrir", "Guardar", "Salir"));
         menuBar.add(crearMenu("Editar", "Copiar", "Pegar", "Deshacer", "Rehacer"));
         menuBar.add(crearMenu("Analisis", "Analizador Léxico", "Analizador Sintáctico"));
-        menuBar.add(crearMenu("Source", "Formatear", "Comentar/Descomentar"));
-        menuBar.add(crearMenu("Buscar", "Buscar", "Reemplazar"));
-        menuBar.add(crearMenu("Run", "Ejecutar", "Depurar"));
-        menuBar.add(crearMenu("Help", "Documentación", "Acerca de"));
 
-        // BARRA DE HERRAMIENTAS
-        JToolBar toolBar = new JToolBar();
-        toolBar.setFloatable(false);
-        contentPane.add(toolBar, BorderLayout.NORTH);
-
-        toolBar.add(crearBoton("Nuevo", "C:\\Users\\shoxd\\git\\repository\\Compilador\\src\\Interfaz\\Iconos\\agregar-archivo.png", "Archivo>Nuevo"));
-        toolBar.add(crearBoton("Abrir", "C:\\Users\\shoxd\\git\\repository\\Compilador\\src\\Interfaz\\Iconos\\carpeta-abierta.png", "Archivo>Abrir"));
-        toolBar.add(crearBoton("Guardar", "C:\\Users\\shoxd\\git\\repository\\Compilador\\src\\Interfaz\\Iconos\\guardar-el-archivo.png", "Archivo>Guardar"));
-        toolBar.addSeparator();
-        toolBar.add(crearBoton("Ejecutar", "C:\\Users\\shoxd\\git\\repository\\Compilador\\src\\Interfaz\\Iconos\\jugar.png", "Run>Ejecutar"));
-        toolBar.add(crearBoton("Depurar", "C:\\Users\\shoxd\\git\\repository\\Compilador\\src\\Interfaz\\Iconos\\depurar.png", "Run>Depurar"));
-
-        //  PANEL CENTRAL
+        // PANEL CENTRAL
         tabbedPane = new JTabbedPane();
 
-        JPanel rightPanel = new JPanel(new GridLayout(2, 1, 5, 5));
-        textLexico = new JTextArea("Resultados Analizador Léxico...");
-        textLexico.setEditable(false);
-        textSintactico = new JTextArea("Estado de la pila Analizador Sintáctico...");
-        textSintactico.setEditable(false);
+        // Panel derecho dividido verticalmente para Léxico y Sintáctico
+        JSplitPane panelDerecho = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        panelDerecho.setDividerLocation(350);
 
-        rightPanel.add(new JScrollPane(textLexico));
-        rightPanel.add(new JScrollPane(textSintactico));
+        // Panel Analizador Léxico
+        JPanel panelLexico = new JPanel(new BorderLayout());
+        tablaLexico = new JTable();
+        panelLexico.add(new JScrollPane(tablaLexico), BorderLayout.CENTER);
+        panelLexico.setBorder(BorderFactory.createTitledBorder("Analizador Léxico"));
 
-        JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabbedPane, rightPanel);
+        // Panel Analizador Sintáctico
+        JPanel panelSintactico = new JPanel(new BorderLayout());
+        tablaSintactico = new JTable();
+        panelSintactico.add(new JScrollPane(tablaSintactico), BorderLayout.CENTER);
+        panelSintactico.setBorder(BorderFactory.createTitledBorder("Analizador Sintáctico"));
+
+        panelDerecho.setTopComponent(panelLexico);
+        panelDerecho.setBottomComponent(panelSintactico);
+
+        // Split horizontal principal
+        JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabbedPane, panelDerecho);
         mainSplit.setDividerLocation(700);
         contentPane.add(mainSplit, BorderLayout.CENTER);
     }
@@ -94,16 +89,6 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         }
         return menu;
     }
-
-    private JButton crearBoton(String tooltip, String iconPath, String actionCommand) {
-        JButton boton = new JButton();
-        boton.setToolTipText(tooltip);
-        boton.setIcon(new ImageIcon(iconPath));
-        boton.setActionCommand(actionCommand);
-        boton.addActionListener(this);
-        return boton;
-    }
-
 
     private JTextArea getEditorActivo() {
         if (tabbedPane.getSelectedComponent() == null) {
@@ -165,64 +150,56 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         }
 
         switch (comando) {
-            case "Archivo>Abrir":
-                String contenido = FuncionesCompilador.abrirArchivo(this);
-                if (contenido != null) {
-                    JTextArea nuevoEditorAbrir = crearNuevoEditor();
-                    nuevoEditorAbrir.setText(contenido);
-                    int numAbrir = tabbedPane.getTabCount() + 1;
-                    agregarNuevaPestana("Archivo" + numAbrir, nuevoEditorAbrir);
-                    setTitle("Prototipo Compilador - Archivo abierto");
-                }
-                break;
-            case "Archivo>Guardar":
-                FuncionesCompilador.guardarArchivo(this, editor.getText());
-                break;
-            case "Archivo>Salir":
-                System.exit(0);
-                break;
-            case "Editar>Copiar":
-                editor.copy();
-                break;
-            case "Editar>Pegar":
-                editor.paste();
-                break;
-            case "Editar>Deshacer":
-                FuncionesCompilador.deshacer();
-                break;
-            case "Editar>Rehacer":
-                FuncionesCompilador.rehacer();
-                break;
             case "Analisis>Analizador Léxico":
-                textLexico.setText(FuncionesCompilador.ejecutarAnalizadorLexico(editor.getText()));
+                mostrarTablaLexico(editor.getText());
                 break;
             case "Analisis>Analizador Sintáctico":
-                textSintactico.setText(FuncionesCompilador.ejecutarAnalizadorSintactico(editor.getText()));
+                // mostrarTablaSintactico(editor.getText());
                 break;
-            case "Source>Formatear":
-                editor.setText(FuncionesCompilador.formatearCodigo(editor.getText()));
-                break;
-            case "Source>Comentar/Descomentar":
-                editor.setText(FuncionesCompilador.comentarDescomentar(editor.getText()));
-                break;
-            case "Buscar>Buscar":
-                FuncionesCompilador.buscar(editor, this);
-                break;
-            case "Buscar>Reemplazar":
-                FuncionesCompilador.reemplazar(editor, this);
-                break;
-            case "Run>Ejecutar":
-                FuncionesCompilador.ejecutar(editor.getText(), textLexico);
-                break;
-            case "Run>Depurar":
-                FuncionesCompilador.depurar(editor.getText(), textSintactico);
-                break;
-            case "Help>Documentación":
-                FuncionesCompilador.abrirDocumentacion(this);
-                break;
-            case "Help>Acerca de":
-                FuncionesCompilador.acercaDe(this);
-                break;
+            // Otros casos como abrir, guardar, etc. los dejas igual
         }
     }
+
+    // === Métodos para llenar las tablas ===
+
+    private void mostrarTablaLexico(String codigoFuente) {
+        try {
+            List<Token> tokens = FuncionesCompilador.obtenerTokens(codigoFuente);
+            String[] columnas = {"Lexema", "Patron", "Componente"};
+            String[][] datos = new String[tokens.size()][3];
+
+            for (int i = 0; i < tokens.size(); i++) {
+                Token t = tokens.get(i);
+                datos[i][0] = t.valor;
+                datos[i][1] = t.tipo.name();
+                datos[i][2] = FuncionesCompilador.obtenerComponente(t.tipo);
+            }
+
+            tablaLexico.setModel(new javax.swing.table.DefaultTableModel(datos, columnas));
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al analizar el código: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /* private void mostrarTablaSintactico(String codigoFuente) {
+        try {
+            // Supongamos que tu parser devuelve una lista de String[]: {Estado, Token, Acción}
+            List<String[]> estados = FuncionesCompilador.obtenerEstadosSintacticos(codigoFuente);
+
+            String[] columnas = {"Estado", "Token", "Acción"};
+            String[][] datos = new String[estados.size()][3];
+
+            for (int i = 0; i < estados.size(); i++) {
+                datos[i] = estados.get(i);
+            }
+
+            tablaSintactico.setModel(new javax.swing.table.DefaultTableModel(datos, columnas));
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al analizar sintácticamente: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }*/
 }

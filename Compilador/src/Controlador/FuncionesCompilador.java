@@ -2,7 +2,14 @@ package Controlador;
 
 import javax.swing.*;
 import javax.swing.undo.*;
+
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import Analizador.Token;
+import Analizador.AnalizadorLexico;
+import Analizador.TokenType;
 
 public class FuncionesCompilador {
 
@@ -43,9 +50,74 @@ public class FuncionesCompilador {
         frame.setTitle("Prototipo Compilador - Nuevo archivo");
     }
 
-    public static String ejecutarAnalizadorLexico(String codigo) {
-        return "Resultado análisis léxico de " + codigo.length() + " caracteres";
+    public static String ejecutarAnalizadorLexico(String codigoFuente) {
+        StringBuilder resultado = new StringBuilder();
+
+        // Encabezado de la tabla
+        resultado.append(String.format("%-15s | %-15s | %-20s\n", "Lexema", "Patron", "Componente"));
+        resultado.append("--------------------------------------------------------------\n");
+
+        try {
+            Reader reader = new StringReader(codigoFuente);
+            AnalizadorLexico lexer = new AnalizadorLexico(reader);
+            Token token;
+
+            while ((token = lexer.yylex()) != null) {
+                String lexema = token.valor;                       // acceso directo al campo
+                String patron = token.tipo.name();
+                String componente = obtenerComponente(token.tipo);
+
+                resultado.append(String.format("%-15s | %-15s | %-20s\n",
+                        lexema, patron, componente));
+            }
+        } catch (Exception e) {
+            resultado.append("Error en análisis léxico: ").append(e.getMessage());
+        }
+
+        return resultado.toString();
     }
+
+    // === Método auxiliar para obtener el nombre del componente según TokenType ===
+    public static String obtenerComponente(TokenType tipo) {
+        switch (tipo) {
+            case INT: case FLOAT: case BOOLEAN: case STRING:
+                return "Tipo de dato";
+            case TRUE: case FALSE:
+                return "Literal booleano";
+            case SUMA: case RESTA: case MULTIPLICACION: case DIVISION: case POTENCIA: case MODULO:
+                return "Operador aritmético";
+            case IGUAL: case DIFERENTE: case MENOR: case MAYOR: case MENOR_IGUAL: case MAYOR_IGUAL:
+                return "Operador relacional";
+            case AND: case OR: case NOT:
+                return "Operador lógico";
+            case ASIGNACION: case PUNTOYCOMA: case PAREN_ABRE: case PAREN_CIERRA: case LLAVE_ABRE: case LLAVE_CIERRA:
+                return "Símbolo";
+            case IDENTIFICADOR:
+                return "Identificador";
+            case NUMERO:
+                return "Número";
+            case CADENA:
+                return "Cadena";
+            default:
+                return "Desconocido";
+        }
+    }
+    
+    public static List<Token> obtenerTokens(String codigoFuente) {
+        List<Token> lista = new ArrayList<>();
+        try {
+            Reader reader = new StringReader(codigoFuente);
+            AnalizadorLexico lexer = new AnalizadorLexico(reader);
+            Token token;
+            while ((token = lexer.yylex()) != null) {
+                lista.add(token);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
 
     public static String ejecutarAnalizadorSintactico(String codigo) {
         return "Estado de pila sintáctica simulado para " + codigo.length() + " caracteres";
