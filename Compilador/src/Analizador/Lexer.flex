@@ -28,7 +28,7 @@ ESPACIO     = [ \t\r\n]+
 
 %%
 
-/* --- Palabras reservadas y tipos de datos --- */
+/* --- Palabras reservadas, tipos de datos --- */
 "int"                   { return token(TokenType.INT, yytext()); }
 "float"                 { return token(TokenType.FLOAT, yytext()); }
 "boolean"               { return token(TokenType.BOOLEAN, yytext()); }
