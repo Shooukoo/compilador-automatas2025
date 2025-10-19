@@ -2,20 +2,25 @@ package Interfaz;
 
 import Controlador.FuncionesCompilador;
 import Analizador.Token;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.List;
 
 public class Prototipo_Interfaz extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
-
     private JTabbedPane tabbedPane;
     private JTable tablaLexico;
     private JTable tablaSintactico;
+
+    private final String TITULO_BASE = "Prototipo Compilador - " + System.getProperty("user.dir");
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -29,7 +34,7 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
     }
 
     public Prototipo_Interfaz() {
-        setTitle("Prototipo Compilador - " + System.getProperty("user.dir"));
+        setTitle(TITULO_BASE);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1200, 800);
 
@@ -37,27 +42,22 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
 
-        // BARRA DE MENÚS
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
         menuBar.add(crearMenu("Archivo", "Nuevo", "Abrir", "Guardar", "Salir"));
         menuBar.add(crearMenu("Editar", "Copiar", "Pegar", "Deshacer", "Rehacer"));
         menuBar.add(crearMenu("Analisis", "Analizador Léxico", "Analizador Sintáctico"));
 
-        // PANEL CENTRAL
         tabbedPane = new JTabbedPane();
 
-        // Panel derecho dividido verticalmente para Léxico y Sintáctico
         JSplitPane panelDerecho = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         panelDerecho.setDividerLocation(350);
 
-        // Panel Analizador Léxico
         JPanel panelLexico = new JPanel(new BorderLayout());
         tablaLexico = new JTable();
         panelLexico.add(new JScrollPane(tablaLexico), BorderLayout.CENTER);
         panelLexico.setBorder(BorderFactory.createTitledBorder("Analizador Léxico"));
 
-        // Panel Analizador Sintáctico
         JPanel panelSintactico = new JPanel(new BorderLayout());
         tablaSintactico = new JTable();
         panelSintactico.add(new JScrollPane(tablaSintactico), BorderLayout.CENTER);
@@ -66,17 +66,9 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         panelDerecho.setTopComponent(panelLexico);
         panelDerecho.setBottomComponent(panelSintactico);
 
-        // Split horizontal principal
         JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabbedPane, panelDerecho);
         mainSplit.setDividerLocation(700);
         contentPane.add(mainSplit, BorderLayout.CENTER);
-    }
-
-    private JTextArea crearNuevoEditor() {
-        JTextArea editor = new JTextArea();
-        editor.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        editor.getDocument().addUndoableEditListener(FuncionesCompilador.getUndoManager());
-        return editor;
     }
 
     private JMenu crearMenu(String nombre, String... opciones) {
@@ -90,19 +82,61 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         return menu;
     }
 
-    private JTextArea getEditorActivo() {
-        if (tabbedPane.getSelectedComponent() == null) {
-            return null;
-        }
-        return (JTextArea) ((JScrollPane) tabbedPane.getSelectedComponent()).getViewport().getView();
+    private JTextArea crearNuevoEditor() {
+        JTextArea editor = new JTextArea();
+        editor.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        editor.getDocument().addUndoableEditListener(FuncionesCompilador.getUndoManager());
+
+        editor.getDocument().addDocumentListener(new DocumentListener() {
+            private void marcarModificado() {
+                JScrollPane scroll = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, editor);
+                if (scroll == null) return;
+                int index = tabbedPane.indexOfComponent(scroll);
+                if (index >= 0 && !tabbedPane.getTitleAt(index).endsWith("*")) {
+                    tabbedPane.setTitleAt(index, tabbedPane.getTitleAt(index) + "*");
+                    actualizarTituloVentana(index);
+                }
+            }
+
+            @Override public void insertUpdate(DocumentEvent e) { marcarModificado(); }
+            @Override public void removeUpdate(DocumentEvent e) { marcarModificado(); }
+            @Override public void changedUpdate(DocumentEvent e) { marcarModificado(); }
+        });
+
+        return editor;
     }
 
-    private void agregarNuevaPestana(String nombre, JTextArea editor) {
+    private void agregarNuevaPestana(String nombre, JTextArea editor, File archivo) {
         JScrollPane scroll = new JScrollPane(editor);
-        tabbedPane.addTab(nombre, scroll);
+        scroll.putClientProperty("archivo", archivo);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
 
-        JPanel pnlTab = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        /*
+        LineNumberView lineNumberView = new LineNumberView(editor);
+
+        // Ajustar margen después de que la pestaña sea visible
+        SwingUtilities.invokeLater(() -> {
+            int alturaPestana = 0;
+            if (tabbedPane.getTabCount() > 0) {
+                Rectangle r = tabbedPane.getUI().getTabBounds(tabbedPane, 0);
+                if (r != null) alturaPestana = r.height;
+            }
+            lineNumberView.setBorder(BorderFactory.createEmptyBorder(alturaPestana, 0, 0, 0));
+        });
+
+        scroll.setRowHeaderView(lineNumberView);
+		*/
+
+        tabbedPane.addTab(nombre, scroll);
+        int index = tabbedPane.indexOfComponent(scroll);
+        tabbedPane.setTabComponentAt(index, crearTabConBoton(nombre, scroll, editor));
+        tabbedPane.setSelectedComponent(scroll);
+    }
+
+    private JPanel crearTabConBoton(String nombre, JScrollPane scroll, JTextArea editor) {
+        JPanel pnlTab = new JPanel();
         pnlTab.setOpaque(false);
+        pnlTab.setLayout(new BoxLayout(pnlTab, BoxLayout.X_AXIS));
 
         JLabel lblTitulo = new JLabel(nombre + "  ");
         JButton btnCerrar = new JButton("x");
@@ -112,60 +146,118 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         btnCerrar.setFocusable(false);
 
         pnlTab.add(lblTitulo);
+        pnlTab.add(Box.createRigidArea(new Dimension(5, 0)));
         pnlTab.add(btnCerrar);
 
-        tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, pnlTab);
-
         btnCerrar.addActionListener(e -> {
-            if (!editor.getText().isEmpty()) {
+            int idx = tabbedPane.indexOfComponent(scroll);
+            String titulo = tabbedPane.getTitleAt(idx);
+            if (titulo.endsWith("*")) {
                 int opcion = JOptionPane.showConfirmDialog(
                         this,
-                        "El archivo no se ha guardado. ¿Deseas cerrar de todas formas?",
+                        "El archivo tiene cambios no guardados. ¿Deseas cerrar de todas formas?",
                         "Advertencia",
                         JOptionPane.YES_NO_OPTION
                 );
                 if (opcion != JOptionPane.YES_OPTION) return;
             }
             tabbedPane.remove(scroll);
+            if (tabbedPane.getTabCount() == 0) setTitle(TITULO_BASE);
         });
 
-        tabbedPane.setSelectedComponent(scroll);
+        return pnlTab;
+    }
+
+    private void actualizarTituloVentana(int index) {
+        JScrollPane scroll = (JScrollPane) tabbedPane.getComponentAt(index);
+        File archivo = (File) scroll.getClientProperty("archivo");
+        if (archivo != null) {
+            setTitle("Prototipo Compilador - " + archivo.getAbsolutePath());
+        } else {
+            setTitle("Prototipo Compilador - Archivo nuevo");
+        }
+    }
+
+    private JTextArea getEditorActivo() {
+        if (tabbedPane.getSelectedComponent() == null) return null;
+        return (JTextArea) ((JScrollPane) tabbedPane.getSelectedComponent()).getViewport().getView();
+    }
+
+    private JScrollPane getScrollActivo() {
+        return (JScrollPane) tabbedPane.getSelectedComponent();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         String comando = e.getActionCommand();
-
-        if (comando.equals("Archivo>Nuevo")) {
-            JTextArea nuevoEditor = crearNuevoEditor();
-            int numero = tabbedPane.getTabCount() + 1;
-            agregarNuevaPestana("Archivo" + numero, nuevoEditor);
-            return;
-        }
-
         JTextArea editor = getEditorActivo();
-        if (editor == null) {
-            JOptionPane.showMessageDialog(this, "No hay ningún archivo abierto.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        JScrollPane scroll = getScrollActivo();
 
         switch (comando) {
+            case "Archivo>Nuevo":
+                JTextArea nuevo = crearNuevoEditor();
+                agregarNuevaPestana("Archivo" + (tabbedPane.getTabCount() + 1), nuevo, null);
+                break;
+
+            case "Archivo>Abrir":
+                String contenido = FuncionesCompilador.abrirArchivo(this);
+                if (contenido != null) {
+                    JTextArea nuevoEditor = crearNuevoEditor();
+                    nuevoEditor.setText(contenido);
+                    File archivo = FuncionesCompilador.getArchivoActual();
+                    agregarNuevaPestana(archivo.getName(), nuevoEditor, archivo);
+                    setTitle("Prototipo Compilador - " + archivo.getAbsolutePath());
+                }
+                break;
+
+            case "Archivo>Guardar":
+                if (editor == null) {
+                    JOptionPane.showMessageDialog(this, "No hay archivo activo");
+                    return;
+                }
+                File archivoActual = (File) scroll.getClientProperty("archivo");
+                File guardado = FuncionesCompilador.guardarArchivo(this, archivoActual, editor.getText());
+                if (guardado != null) {
+                    scroll.putClientProperty("archivo", guardado);
+                    int idx = tabbedPane.getSelectedIndex();
+                    tabbedPane.setTitleAt(idx, guardado.getName());
+                    tabbedPane.setTabComponentAt(idx, crearTabConBoton(guardado.getName(), scroll, editor));
+                    setTitle("Prototipo Compilador - " + guardado.getAbsolutePath());
+                }
+                break;
+
+            case "Archivo>Salir":
+                System.exit(0);
+                break;
+
+            case "Editar>Copiar":
+                if (editor != null) editor.copy();
+                break;
+            case "Editar>Pegar":
+                if (editor != null) editor.paste();
+                break;
+            case "Editar>Deshacer":
+                FuncionesCompilador.deshacer();
+                break;
+            case "Editar>Rehacer":
+                FuncionesCompilador.rehacer();
+                break;
+
             case "Analisis>Analizador Léxico":
-                mostrarTablaLexico(editor.getText());
+                if (editor != null)
+                    mostrarTablaLexico(editor.getText());
                 break;
+
             case "Analisis>Analizador Sintáctico":
-                // mostrarTablaSintactico(editor.getText());
+                JOptionPane.showMessageDialog(this, "Análisis sintáctico en desarrollo");
                 break;
-            // Otros casos como abrir, guardar, etc. los dejas igual
         }
     }
-
-    // === Métodos para llenar las tablas ===
 
     private void mostrarTablaLexico(String codigoFuente) {
         try {
             List<Token> tokens = FuncionesCompilador.obtenerTokens(codigoFuente);
-            String[] columnas = {"Lexema", "Patron", "Componente"};
+            String[] columnas = {"Lexema", "Patrón", "Componente"};
             String[][] datos = new String[tokens.size()][3];
 
             for (int i = 0; i < tokens.size(); i++) {
@@ -178,28 +270,7 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
             tablaLexico.setModel(new javax.swing.table.DefaultTableModel(datos, columnas));
 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al analizar el código: " + ex.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al analizar: " + ex.getMessage());
         }
     }
-
-    /* private void mostrarTablaSintactico(String codigoFuente) {
-        try {
-            // Supongamos que tu parser devuelve una lista de String[]: {Estado, Token, Acción}
-            List<String[]> estados = FuncionesCompilador.obtenerEstadosSintacticos(codigoFuente);
-
-            String[] columnas = {"Estado", "Token", "Acción"};
-            String[][] datos = new String[estados.size()][3];
-
-            for (int i = 0; i < estados.size(); i++) {
-                datos[i] = estados.get(i);
-            }
-
-            tablaSintactico.setModel(new javax.swing.table.DefaultTableModel(datos, columnas));
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error al analizar sintácticamente: " + ex.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }*/
 }
