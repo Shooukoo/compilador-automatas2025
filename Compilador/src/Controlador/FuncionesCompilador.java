@@ -46,7 +46,6 @@ public class FuncionesCompilador {
                 if (resultado != JFileChooser.APPROVE_OPTION) return null;
                 archivo = chooser.getSelectedFile();
 
-                // 🧩 Agregar extensión .txt si no la tiene
                 if (!archivo.getName().toLowerCase().endsWith(".txt")) {
                     archivo = new File(archivo.getAbsolutePath() + ".txt");
                 }
@@ -64,7 +63,7 @@ public class FuncionesCompilador {
         return null;
     }
 
-    // ======== ANALIZADORES ========
+    // ANALIZADORES
     public static List<Token> obtenerTokens(String codigoFuente) {
         List<Token> lista = new ArrayList<>();
         try {
@@ -82,19 +81,17 @@ public class FuncionesCompilador {
 
     public static String obtenerComponente(TokenType tipo) {
         switch (tipo) {
-            case INT: case FLOAT: case BOOLEAN: case STRING:
+            case INT ,FLOAT, BOOLEAN, STRING:
                 return "Tipo de dato";
-            case TRUE: case FALSE:
+            case TRUE, FALSE:
                 return "Literal booleano";
-            case SUMA: case RESTA: case MULTIPLICACION: case DIVISION:
+            case SUMA, RESTA, MULTIPLICACION, DIVISION:
                 return "Operador aritmético";
-            case IGUAL: case DIFERENTE: case MENOR: case MAYOR:
-            case MENOR_IGUAL: case MAYOR_IGUAL:
+            case IGUAL, DIFERENTE, MENOR, MAYOR, MENOR_IGUAL, MAYOR_IGUAL:
                 return "Operador relacional";
-            case AND: case OR: case NOT:
+            case AND, OR ,NOT:
                 return "Operador lógico";
-            case ASIGNACION: case PUNTOYCOMA: case PAREN_ABRE:
-            case PAREN_CIERRA: case LLAVE_ABRE: case LLAVE_CIERRA:
+            case ASIGNACION, PUNTOYCOMA, PAREN_ABRE, PAREN_CIERRA, LLAVE_ABRE, LLAVE_CIERRA:
                 return "Símbolo";
             case IDENTIFICADOR:
                 return "Identificador";
@@ -106,8 +103,7 @@ public class FuncionesCompilador {
                 return "Desconocido";
         }
     }
-
-    // ======== UTILIDADES ========
+    
     public static void deshacer() {
         if (undoManager.canUndo()) undoManager.undo();
     }

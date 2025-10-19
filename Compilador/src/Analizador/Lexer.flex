@@ -12,13 +12,13 @@ import java.io.*;
 %type Token
 
 %{
-  // Código Java embebido dentro del lexer
+  // Código embebido dentro del lexer
   private Token token(TokenType tipo, String valor) {
       return new Token(tipo, valor);
   }
 %}
 
-/* === Definiciones de expresiones regulares === */
+/* Expresiones regulares */
 DIGITO      = [0-9]
 LETRA       = [a-zA-Z_]
 IDENT       = {LETRA}({LETRA}|{DIGITO})*
@@ -28,7 +28,7 @@ ESPACIO     = [ \t\r\n]+
 
 %%
 
-/* --- Palabras reservadas, tipos de datos --- */
+/* Palabras reservadas, tipos de datos */
 "int"                   { return token(TokenType.INT, yytext()); }
 "float"                 { return token(TokenType.FLOAT, yytext()); }
 "boolean"               { return token(TokenType.BOOLEAN, yytext()); }
@@ -36,7 +36,7 @@ ESPACIO     = [ \t\r\n]+
 "true"                  { return token(TokenType.TRUE, yytext()); }
 "false"                 { return token(TokenType.FALSE, yytext()); }
 
-/* --- Operadores aritméticos --- */
+/* Operadores aritméticos */
 "+"                     { return token(TokenType.SUMA, yytext()); }
 "-"                     { return token(TokenType.RESTA, yytext()); }
 "*"                     { return token(TokenType.MULTIPLICACION, yytext()); }
@@ -44,7 +44,7 @@ ESPACIO     = [ \t\r\n]+
 "^"                     { return token(TokenType.POTENCIA, yytext()); }
 "%"                     { return token(TokenType.MODULO, yytext()); }
 
-/* --- Operadores relacionales --- */
+/* Operadores relacionales */
 "=="                    { return token(TokenType.IGUAL, yytext()); }
 "!="                    { return token(TokenType.DIFERENTE, yytext()); }
 "<="                    { return token(TokenType.MENOR_IGUAL, yytext()); }
@@ -52,12 +52,12 @@ ESPACIO     = [ \t\r\n]+
 ">"                     { return token(TokenType.MAYOR, yytext()); }
 "<"                     { return token(TokenType.MENOR, yytext()); }
 
-/* --- Operadores lógicos --- */
+/* Operadores lógicos */
 "&&"                    { return token(TokenType.AND, yytext()); }
 "||"                    { return token(TokenType.OR, yytext()); }
 "!"                     { return token(TokenType.NOT, yytext()); }
 
-/* --- Otros símbolos --- */
+/* Otros símbolos */
 "="                     { return token(TokenType.ASIGNACION, yytext()); }
 ";"                     { return token(TokenType.PUNTOYCOMA, yytext()); }
 "("                     { return token(TokenType.PAREN_ABRE, yytext()); }
@@ -65,12 +65,12 @@ ESPACIO     = [ \t\r\n]+
 "{"                     { return token(TokenType.LLAVE_ABRE, yytext()); }
 "}"                     { return token(TokenType.LLAVE_CIERRA, yytext()); }
 
-/* --- Identificadores y valores --- */
+/* Identificadores y valores */
 {IDENT}                 { return token(TokenType.IDENTIFICADOR, yytext()); }
 {NUMERO}                { return token(TokenType.NUMERO, yytext()); }
 {CADENA}                { return token(TokenType.CADENA, yytext()); }
 
-/* --- Espacios y comentarios --- */
+/* Espacios y comentarios */
 {ESPACIO}               { /* ignorar espacios */ }
 "//".*                  { /* ignorar comentario de línea */ }
 

@@ -107,6 +107,29 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
     }
 
     private void agregarNuevaPestana(String nombre, JTextArea editor, File archivo) {
+        // Scroll asociado al editor
+        JScrollPane scroll = new JScrollPane(editor);
+        scroll.putClientProperty("archivo", archivo);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+
+        // numeración de líneas
+        NumeroLinea numeroLinea = new NumeroLinea(editor);
+        scroll.setRowHeaderView(numeroLinea);
+
+        // Margen superior al editor
+        int margenSuperior = 8; 
+        editor.setMargin(new Insets(margenSuperior, 5, 5, 5));
+
+        // Pestaña al contenedor
+        tabbedPane.addTab(nombre, scroll);
+        int index = tabbedPane.indexOfComponent(scroll);
+        tabbedPane.setTabComponentAt(index, crearTabConBoton(nombre, scroll, editor));
+        tabbedPane.setSelectedComponent(scroll);
+    }
+
+    
+    /*
+    private void agregarNuevaPestana(String nombre, JTextArea editor, File archivo) {
         JScrollPane scroll = new JScrollPane(editor);
         scroll.putClientProperty("archivo", archivo);
         scroll.setBorder(BorderFactory.createEmptyBorder());
@@ -125,14 +148,12 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         });
 
         scroll.setRowHeaderView(lineNumberView);
-		*/
-
         tabbedPane.addTab(nombre, scroll);
         int index = tabbedPane.indexOfComponent(scroll);
         tabbedPane.setTabComponentAt(index, crearTabConBoton(nombre, scroll, editor));
         tabbedPane.setSelectedComponent(scroll);
     }
-
+    */
     private JPanel crearTabConBoton(String nombre, JScrollPane scroll, JTextArea editor) {
         JPanel pnlTab = new JPanel();
         pnlTab.setOpaque(false);
