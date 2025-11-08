@@ -42,7 +42,7 @@ import Analizador.TokenType;
   }
 %}
 
-// --- Definiciones de Macros (Expresiones Regulares Nombradas) ---
+// --- Definiciones de Macros ---
 DIGITO      = [0-9]
 LETRA       = [a-zA-Z_]
 IDENT       = {LETRA}({LETRA}|{DIGITO})*
