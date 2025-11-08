@@ -1,7 +1,10 @@
 package Analizador;
 
+/**
+ * Enumeración de todos los tipos de tokens posibles que el AnalizadorLexico puede reconocer.
+ */
 public enum TokenType {
-	// Tipos de datos
+    // Tipos de datos y literales booleanos
     INT, FLOAT, BOOLEAN, STRING, TRUE, FALSE,
 
     // Operadores aritméticos
@@ -13,9 +16,12 @@ public enum TokenType {
     // Operadores lógicos
     AND, OR, NOT,
 
-    // Otros símbolos
+    // Otros símbolos y delimitadores
     ASIGNACION, PUNTOYCOMA, PAREN_ABRE, PAREN_CIERRA, LLAVE_ABRE, LLAVE_CIERRA,
 
     // Valores e identificadores
-    IDENTIFICADOR, NUMERO, CADENA
+    IDENTIFICADOR, NUMERO, CADENA,
+
+    // Tipo especial para errores léxicos
+    ERROR 
 }
