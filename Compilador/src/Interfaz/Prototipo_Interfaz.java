@@ -8,8 +8,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -54,12 +52,9 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
             }
         });
     }
-
-    /**
-     * Constructor de la ventana principal.
-     */
+    
     public Prototipo_Interfaz() {
-        // Inicializar el UndoManager (obtenido del controlador)
+        
         undoManagerGlobal = FuncionesCompilador.getUndoManager();
 
         setTitle(TITULO_BASE);
@@ -123,7 +118,7 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         panelSintactico.add(scrollSintactico, BorderLayout.CENTER);
         panelSintactico.setBorder(BorderFactory.createTitledBorder("Análisis Sintáctico"));
-
+        
         panelDerecho.setTopComponent(panelLexico);
         panelDerecho.setBottomComponent(panelSintactico);
         panelDerecho.setDividerLocation(300);
@@ -183,7 +178,7 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         // Conectar el editor al UndoManager global
         editor.getDocument().addUndoableEditListener(undoManagerGlobal);
 
-        // Listener para marcar la pestaña como modificada (*)
+        // Listener para marcar la pestaña como modificada
         editor.getDocument().addDocumentListener(new DocumentListener() {
             private void marcarModificado() {
                 Container scrollPane = SwingUtilities.getAncestorOfClass(JScrollPane.class, editor);
@@ -307,7 +302,7 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
                 if (guardarArchivoActual()) {
                     tabbedPane.remove(idx); // Cerrar si se guardó
                 }
-                // Si guardarArchivoActual() devuelve false (cancelado), no se cierra
+                // Si guardarArchivoActual() devuelve false no se cierra
             } else if (opcion == JOptionPane.NO_OPTION) {
                 tabbedPane.remove(idx); // Cerrar sin guardar
             }
@@ -460,12 +455,9 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
                 break;
 
             case "Archivo>Salir":
-                // Aquí deberías iterar por todas las pestañas y verificar si hay cambios
-                // Por ahora, cerramos directamente.
                 System.exit(0);
                 break;
 
-            // --- Editar ---
             case "Editar>Copiar":
                 if (editor != null) editor.copy();
                 break;
@@ -479,7 +471,6 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
                  FuncionesCompilador.rehacer();
                 break;
 
-            // --- Análisis ---
             case "Análisis>Analizador Léxico":
                 if (editor != null) {
                     mostrarResultadoAnalisisLexico(editor.getText());
@@ -563,45 +554,10 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         }
 
         tablaLexico.setModel(modelTabla);
-        ajustarAnchoColumnasTabla(tablaLexico);
 
          // Limpiar tabla sintáctica
          tablaSintactico.setModel(new DefaultTableModel());
     }
-
-    /**
-     * Ajusta el ancho de las columnas de una JTable basado en el contenido.
-     */
-     private void ajustarAnchoColumnasTabla(JTable tabla) {
-        tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        for (int column = 0; column < tabla.getColumnCount(); column++) {
-            int width = 75; // Ancho mínimo
-            
-            // Ancho de la cabecera
-             try {
-                 JTableHeader header = tabla.getTableHeader();
-                 TableCellRenderer headerRenderer = (header != null) ? header.getDefaultRenderer() : null;
-                 if (headerRenderer != null) {
-                     Component headerComp = headerRenderer.getTableCellRendererComponent(tabla, tabla.getColumnName(column), false, false, -1, column);
-                     width = Math.max(width, headerComp.getPreferredSize().width + 10);
-                 }
-             } catch (Exception e) { /* Ignorar si falla */ }
-
-
-            // Ancho del contenido (revisar algunas filas)
-            int maxRowsToCheck = Math.min(tabla.getRowCount(), 50); // Revisar máx 50 filas
-            for (int row = 0; row < maxRowsToCheck; row++) {
-                 try {
-                     TableCellRenderer cellRenderer = tabla.getCellRenderer(row, column);
-                     Component cellComp = cellRenderer.getTableCellRendererComponent(tabla, tabla.getValueAt(row, column), false, false, row, column);
-                     width = Math.max(width, cellComp.getPreferredSize().width + 10);
-                 } catch (Exception e) { /* Ignorar si falla */ }
-            }
-             
-            width = Math.min(width, 400); // Ancho máximo
-            tabla.getColumnModel().getColumn(column).setPreferredWidth(width);
-        }
-     }
      
      private JButton crearBotonConIcono(String tooltip, String comando, String rutaIcono) {
     	    JButton boton = new JButton();

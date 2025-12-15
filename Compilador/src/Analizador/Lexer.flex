@@ -1,9 +1,7 @@
 package Analizador;
 
 import java.io.*;
-// Importar FuncionesCompilador para reportar errores
 import Controlador.FuncionesCompilador;
-// Importar TokenType para usar el tipo ERROR
 import Analizador.TokenType;
 
 %%
