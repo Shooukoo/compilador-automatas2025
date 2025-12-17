@@ -1,22 +1,11 @@
 package Analizador;
 
-/**
- * Representa un token léxico identificado por el analizador.
- * Contiene el tipo de token, su valor (lexema), y su posición (línea y columna).
- */
 public class Token {
-    public TokenType tipo;
-    public String valor;
-    public int linea;
-    public int columna;
+    private TokenType tipo;
+    private String valor;
+    private int linea;
+    private int columna;
 
-    /**
-     * Constructor para un nuevo token.
-     * @param tipo El tipo de token (de TokenType).
-     * @param valor El lexema exacto encontrado en el código.
-     * @param linea La línea donde comienza el token (empezando en 1).
-     * @param columna La columna donde comienza el token (empezando en 1).
-     */
     public Token(TokenType tipo, String valor, int linea, int columna) {
         this.tipo = tipo;
         this.valor = valor;
@@ -24,31 +13,88 @@ public class Token {
         this.columna = columna;
     }
 
-    // --- Getters ---
-
-    public TokenType getTipo() {
-        return tipo;
-    }
-
-    public String getValor() {
-        return valor;
-    }
-
-    public int getLinea() {
-        return linea;
-    }
-
-    public int getColumna() {
-        return columna;
-    }
+    public TokenType getTipo() { return tipo; }
+    public String getValor() { return valor; }
+    public int getLinea() { return linea; }
+    public int getColumna() { return columna; }
 
     /**
-     * Devuelve una representación en String del token, incluyendo su posición.
-     * @return String formateado del token.
+     * Devuelve el nombre EXACTO que espera el TASP.csv (el Excel).
      */
+    public String getComponenteSintactico() {
+        switch (this.tipo) {
+            // --- PALABRAS RESERVADAS (Según tu CSV) ---
+            case PROGRAMA: return "programa";
+            case FIN_PROGRAMA: return "finprograma";
+            case VAR: return "var";
+            case IF: return "if";
+            case ELSE: return "else";
+            case ENDIF: return "endif";
+            case LEER: return "leer";
+            case ESCRIBIR: return "escribir";
+            
+            // --- TIPOS DE DATOS ---
+            case INT: 
+            case ENTERO: return "entero"; // Tu CSV dice "entero"
+            
+            case FLOAT: 
+            case REAL: return "real";   // Tu CSV dice "real"
+            
+            case BOOLEAN: 
+            case BOOL: return "bool";   // Tu CSV dice "bool"
+            
+            case STRING: 
+            case CADENA: return "cadena"; // Tu CSV dice "cadena"
+            
+            case CAR: return "car";
+
+            case TRUE: return "true";
+            case FALSE: return "false";
+
+            // --- LITERALES ---
+            case ID: return "id";
+            case NUM: return "num";
+            case CADENA_LITERAL: return "litcad";
+            case CARACTER_LITERAL: return "litcar";
+
+            // --- OPERADORES Y SIGNOS ---
+            case SUMA: return "+";
+            case RESTA: return "-";
+            case MULTIPLICACION: return "*";
+            case DIVISION: return "/";
+            case MODULO: return "%";
+            case POTENCIA: return "^"; // Verificar si tu CSV usa ^
+            
+            case IGUAL: return "==";
+            case DIFERENTE: return "!=";
+            case MENOR: return "<";
+            case MAYOR: return ">";
+            case MENOR_IGUAL: return "<=";
+            case MAYOR_IGUAL: return ">=";
+            
+            case AND: return "&&";
+            case OR: return "||";
+            case NOT: return "!";
+            
+            case ASIGNACION: return "="; // Ojo: en tu código usas "=" para asignar
+            
+            // --- DELIMITADORES (Aquí tenías el error) ---
+            case COMA: return ",";
+            case DOS_PUNTOS: return ":";
+            case PUNTOYCOMA: return ";";
+            case PAREN_ABRE: return "(";
+            case PAREN_CIERRA: return ")";
+
+            // --- FIN DE ARCHIVO ---
+            case EOF: return "$";
+
+            default:
+                return this.valor;
+        }
+    }
+    
     @Override
     public String toString() {
-        // Incluir posición para depuración
-        return String.format("<%s, \"%s\"> @ (L:%d, C:%d)", tipo, valor, linea, columna);
+        return String.format("%s (L:%d, C:%d)", getComponenteSintactico(), linea, columna);
     }
 }
