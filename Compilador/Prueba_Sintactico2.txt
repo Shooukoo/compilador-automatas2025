@@ -1,0 +1,16 @@
+programa nuevo;
+var
+    a, b, c: entero;
+var
+    x, y: real;
+if x >= 7
+    b = x - 2;
+else
+    c = x >= 2;
+	a = true;
+endif
+if a == b
+	b = a;
+	a = b + 1;
+endif
+finprograma
