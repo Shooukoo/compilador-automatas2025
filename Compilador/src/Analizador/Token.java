@@ -18,12 +18,8 @@ public class Token {
     public int getLinea() { return linea; }
     public int getColumna() { return columna; }
 
-    /**
-     * Devuelve el nombre EXACTO que espera el TASP.csv (el Excel).
-     */
     public String getComponenteSintactico() {
         switch (this.tipo) {
-            // --- PALABRAS RESERVADAS (Según tu CSV) ---
             case PROGRAMA: return "programa";
             case FIN_PROGRAMA: return "finprograma";
             case VAR: return "var";
@@ -33,37 +29,34 @@ public class Token {
             case LEER: return "leer";
             case ESCRIBIR: return "escribir";
             
-            // --- TIPOS DE DATOS ---
             case INT: 
-            case ENTERO: return "entero"; // Tu CSV dice "entero"
+            case ENTERO: return "entero"; 
             
             case FLOAT: 
-            case REAL: return "real";   // Tu CSV dice "real"
+            case REAL: return "real";  
             
             case BOOLEAN: 
-            case BOOL: return "bool";   // Tu CSV dice "bool"
+            case BOOL: return "bool";   
             
             case STRING: 
-            case CADENA: return "cadena"; // Tu CSV dice "cadena"
+            case CADENA: return "cadena"; 
             
             case CAR: return "car";
 
             case TRUE: return "true";
             case FALSE: return "false";
 
-            // --- LITERALES ---
             case ID: return "id";
             case NUM: return "num";
             case CADENA_LITERAL: return "litcad";
             case CARACTER_LITERAL: return "litcar";
 
-            // --- OPERADORES Y SIGNOS ---
             case SUMA: return "+";
             case RESTA: return "-";
             case MULTIPLICACION: return "*";
             case DIVISION: return "/";
             case MODULO: return "%";
-            case POTENCIA: return "^"; // Verificar si tu CSV usa ^
+            case POTENCIA: return "^"; 
             
             case IGUAL: return "==";
             case DIFERENTE: return "!=";
@@ -76,16 +69,14 @@ public class Token {
             case OR: return "||";
             case NOT: return "!";
             
-            case ASIGNACION: return "="; // Ojo: en tu código usas "=" para asignar
+            case ASIGNACION: return "=";
             
-            // --- DELIMITADORES (Aquí tenías el error) ---
             case COMA: return ",";
             case DOS_PUNTOS: return ":";
             case PUNTOYCOMA: return ";";
             case PAREN_ABRE: return "(";
             case PAREN_CIERRA: return ")";
 
-            // --- FIN DE ARCHIVO ---
             case EOF: return "$";
 
             default:

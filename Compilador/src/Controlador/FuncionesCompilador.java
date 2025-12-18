@@ -23,7 +23,6 @@ public class FuncionesCompilador {
         return archivoActual;
     }
 
-    // --- GESTIÓN DE ARCHIVOS (Igual que antes) ---
     public static String abrirArchivo(JFrame parent) {
         JFileChooser chooser = new JFileChooser();
         if (archivoActual != null) {
@@ -106,8 +105,6 @@ public class FuncionesCompilador {
         return null; 
     }
 
-    // --- MANEJO DE ERRORES ---
-
     public static void agregarErrorLexico(String lexema, int linea, int columna) {
         String descripcion = "Símbolo no reconocido: '" + lexema + "'";
         listaErrores.add(new ErrorCompilador(ErrorCompilador.TipoError.LEXICO, linea, columna, descripcion));
@@ -121,7 +118,6 @@ public class FuncionesCompilador {
         return listaErrores;
     }
 
-    // --- ANALIZADORES ---
 
     public static List<Token> obtenerTokens(String codigoFuente) {
         listaErrores.clear(); 
@@ -142,7 +138,7 @@ public class FuncionesCompilador {
                 }
             }
 
-            // IMPORTANTE: Agregar $ al final para la Pila
+            // $ al final para la Pila
             listaTokensValidos.add(new Token(TokenType.EOF, "$", 0, 0));
 
         } catch (IOException e) { 
@@ -152,10 +148,7 @@ public class FuncionesCompilador {
         }
         return listaTokensValidos;
     }
-    
-    /**
-     * MÉTODO NUEVO: Ejecuta el análisis sintáctico (Pila) y devuelve el reporte.
-     */
+   
     public static String ejecutarAnalisisSintactico(List<Token> tokens) {
         AnalizadorSintactico parser = new AnalizadorSintactico();
         List<AnalizadorSintactico.PasoAnalisis> pasos = parser.analizar(tokens);
@@ -163,18 +156,24 @@ public class FuncionesCompilador {
         // Formato visual para el JTextArea
         StringBuilder sb = new StringBuilder();
         sb.append("REPORTE DE LA PILA SINTÁCTICA\n");
-        sb.append("====================================================================================================\n");
-        sb.append(String.format("%-60s | %-15s | %-30s\n", "PILA (Z al fondo)", "ENTRADA", "ACCIÓN"));
-        sb.append("----------------------------------------------------------------------------------------------------\n");
+        sb.append("========================================================================================================================\n");
+        // Ajustamos las cabeceras para incluir la Pila Auxiliar
+        sb.append(String.format("%-50s | %-30s | %-15s | %-30s\n", "PILA PRINCIPAL", "PILA AUX", "ENTRADA", "ACCIÓN"));
+        sb.append("------------------------------------------------------------------------------------------------------------------------\n");
         
         for (AnalizadorSintactico.PasoAnalisis p : pasos) {
-            // Recortar pila visualmente si es muy larga
-            String pilaStr = p.pila;
-            if (pilaStr.length() > 60) pilaStr = "..." + pilaStr.substring(pilaStr.length() - 57);
+            // Recortar Pila Principal si es muy larga
+            String pilaMain = p.pilaPrincipal;
+            if (pilaMain.length() > 50) pilaMain = "..." + pilaMain.substring(pilaMain.length() - 47);
+
+            // Recortar Pila Auxiliar si es muy larga
+            String pilaAux = p.pilaAux;
+            if (pilaAux.length() > 30) pilaAux = "..." + pilaAux.substring(pilaAux.length() - 27);
             
-            sb.append(String.format("%-60s | %-15s | %-30s\n", pilaStr, p.entrada, p.accion));
+            // Usamos p.pilaPrincipal en lugar de p.pila
+            sb.append(String.format("%-50s | %-30s | %-15s | %-30s\n", pilaMain, pilaAux, p.entrada, p.accion));
         }
-        sb.append("====================================================================================================\n");
+        sb.append("========================================================================================================================\n");
 
         if (listaErrores.isEmpty()) {
             sb.append("\n>>> CÓDIGO SINTÁCTICAMENTE CORRECTO <<<");
@@ -184,7 +183,6 @@ public class FuncionesCompilador {
         
         return sb.toString();
     }
-
     public static String obtenerComponente(TokenType tipo) {
          if (tipo == null) return "Desconocido";
         switch (tipo) {
@@ -204,8 +202,7 @@ public class FuncionesCompilador {
             default: return "Símbolo";
         }
     }
-
-    // --- UNDO/REDO ---
+    
     public static void deshacer() {
         if (undoManager.canUndo()) {
              try { undoManager.undo(); } catch (CannotUndoException e) { e.printStackTrace(); }

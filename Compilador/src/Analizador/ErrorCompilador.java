@@ -19,10 +19,6 @@ public class ErrorCompilador {
 
     /**
      * Constructor para un nuevo error.
-     * @param tipo El tipo de error (LEXICO, SINTACTICO, etc.).
-     * @param linea La línea donde ocurrió el error (empezando en 1).
-     * @param columna La columna donde ocurrió el error (empezando en 1).
-     * @param descripcion Una descripción del error.
      */
     public ErrorCompilador(TipoError tipo, int linea, int columna, String descripcion) {
         this.tipo = tipo;
@@ -31,7 +27,6 @@ public class ErrorCompilador {
         this.descripcion = descripcion;
     }
 
-    // --- Getters ---
 
     public TipoError getTipo() { 
         return tipo; 
@@ -49,10 +44,6 @@ public class ErrorCompilador {
         return descripcion; 
     }
 
-    /**
-     * Devuelve una representación en String del error, formateada para la consola.
-     * @return String formateado del error.
-     */
     @Override
     public String toString() {
         return String.format("[%s] Línea %d, Columna %d: %s", tipo, linea, columna, descripcion);

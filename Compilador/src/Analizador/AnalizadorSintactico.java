@@ -5,288 +5,248 @@ import Controlador.FuncionesCompilador;
 import java.util.*;
 
 public class AnalizadorSintactico {
-    
+
     public static class PasoAnalisis {
-        public String pila;
+        public String pilaPrincipal;
+        public String pilaAux; 
         public String entrada;
         public String accion;
 
-        public PasoAnalisis(String pila, String entrada, String accion) {
-            this.pila = pila;
+        public PasoAnalisis(String pila, String pilaAux, String entrada, String accion) {
+            this.pilaPrincipal = pila;
+            this.pilaAux = pilaAux;
             this.entrada = entrada;
             this.accion = accion;
         }
     }
 
-    private Map<String, Map<String, String>> tasp; 
-    private List<PasoAnalisis> bitacora;           
-    private Stack<String> pila;                   
+    private List<PasoAnalisis> bitacora;
+    private Stack<String> pila;
+    private Stack<String> pilaAux; 
+    
+    private String[] vVariables;   
+    private String[] vTerminales;  
+    private String[][] matrizTASP; 
 
     public AnalizadorSintactico() {
-        this.tasp = new HashMap<>();
         this.bitacora = new ArrayList<>();
         this.pila = new Stack<>();
-        inicializarTabla();
+        this.pilaAux = new Stack<>();
+        
+        inicializarVectores();
+        inicializarMatriz();
     }
 
-    private void inicializarTabla() {
-        // --- 1. Prog ---
-        agregarRegla("Prog", "programa", "programa id ; Bloque finprograma");
-        agregarRegla("Prog", "$", "sacar");
+    private void inicializarVectores() {
+        vVariables = new String[] {
+            "Prog", "Bloque", "Dec", "Sigid", "Tipo", 
+            "Sentencia", "Sigif", "Lista_par", "Sigpar", 
+            "EL", "EL'", "ER", "R'", "E", "E'", "T", "T'", "F"
+        };
 
-        // --- 2. Bloque ---
-        agregarRegla("Bloque", "id", "Sentencia Bloque");
-        agregarRegla("Bloque", "if", "Sentencia Bloque");
-        agregarRegla("Bloque", "leer", "Sentencia Bloque");
-        agregarRegla("Bloque", "escribir", "Sentencia Bloque");
+        vTerminales = new String[] {
+            "id", "num", "litcad", "true", "false", 
+            "programa", "finprograma", "var", 
+            "if", "else", "endif", "leer", "escribir",
+            "entero", "real", "cadena", "bool",
+            ",", ":", ";", "(", ")", "=", 
+            "&&", "||", "!", 
+            "<", ">", ">=", "<=", "==", "!=",
+            "+", "-", "*", "/", "--", "++",
+            "$" 
+        };
         
-        // Si viene una declaración (Ahora permitida donde sea):
-        agregarRegla("Bloque", "var", "Dec Bloque");
-        agregarRegla("Bloque", "finprograma", "e");
-        agregarRegla("Bloque", "else", "e");
-        agregarRegla("Bloque", "endif", "e");
-
-        // --- 3. Dec (Declaraciones) ---
-        agregarRegla("Dec", "var", "var id Sigid : Tipo ;");
-        
-        // --- 4. Sigid ---
-        agregarRegla("Sigid", ",", ", id Sigid");
-        agregarRegla("Sigid", ":", "e"); 
-
-        // --- 5. Tipo ---
-        agregarRegla("Tipo", "entero", "entero");
-        agregarRegla("Tipo", "real", "real");
-        agregarRegla("Tipo", "cadena", "cadena");
-        agregarRegla("Tipo", "bool", "bool");
-
-        // --- 6. Sentencia ---
-        agregarRegla("Sentencia", "id", "id = EL ;");
-        agregarRegla("Sentencia", "if", "if EL Bloque Sigif"); 
-        
-        agregarRegla("Sentencia", "leer", "leer ( lista_par ) ;");
-        agregarRegla("Sentencia", "escribir", "escribir ( lista_par ) ;");
-
-        // 7. Sigif
-        agregarRegla("Sigif", "else", "else Bloque endif");
-        agregarRegla("Sigif", "endif", "endif");
-
-        // --- 8. Lista_par ---
-        agregarRegla("Lista_par", "id", "EL Sigpar");
-        agregarRegla("Lista_par", "num", "EL Sigpar");
-        agregarRegla("Lista_par", "litcad", "EL Sigpar");
-        agregarRegla("Lista_par", "(", "EL Sigpar");
-        agregarRegla("Lista_par", ")", "e");
-
-        // --- 9. Sigpar ---
-        agregarRegla("Sigpar", ",", ", EL Sigpar");
-        agregarRegla("Sigpar", ")", "e");
-
-     // --- 10. Expresiones Lógicas (EL) ---
-        String inicioEL = "ER EL'";
-        agregarRegla("EL", "id", inicioEL);
-        agregarRegla("EL", "num", inicioEL);
-        agregarRegla("EL", "litcad", inicioEL);
-        agregarRegla("EL", "true", inicioEL);
-        agregarRegla("EL", "false", inicioEL);
-        agregarRegla("EL", "(", inicioEL);
-        agregarRegla("EL", "!", "! EL");
-        agregarRegla("EL", "--", inicioEL);
-        agregarRegla("EL", "++", inicioEL);
-
-        // --- 11. EL' ---
-        agregarRegla("EL'", "&&", "&& ER EL'");
-        agregarRegla("EL'", "||", "|| ER EL'");
-        agregarRegla("EL'", ")", "e");
-        agregarRegla("EL'", ";", "e");
-        agregarRegla("EL'", ",", "e");
-        agregarRegla("EL'", "id", "e");
-        agregarRegla("EL'", "if", "e");
-        agregarRegla("EL'", "else", "e");
-        agregarRegla("EL'", "endif", "e");
-        agregarRegla("EL'", "finprograma", "e");
-        agregarRegla("EL'", "var", "e"); 
-
-     // --- 12. ER (Expresiones Relacionales) ---
-        String inicioER = "E R'";
-        agregarRegla("ER", "id", inicioER);
-        agregarRegla("ER", "num", inicioER);
-        agregarRegla("ER", "(", inicioER);
-        agregarRegla("ER", "true", "true R'");
-        agregarRegla("ER", "false", "false R'");
-        agregarRegla("ER", "litcad", "litcad R'");
-        agregarRegla("ER", "--", inicioER);
-        agregarRegla("ER", "++", inicioER);
-        
-        // --- 13. R' ---
-        agregarRegla("R'", "<", "< E");
-        agregarRegla("R'", ">", "> E");
-        agregarRegla("R'", ">=", ">= E");
-        agregarRegla("R'", "<=", "<= E");
-        agregarRegla("R'", "==", "== E");
-        agregarRegla("R'", "!=", "!= E");
-        
-        agregarRegla("R'", "&&", "e");
-        agregarRegla("R'", "||", "e");
-        agregarRegla("R'", ")", "e");
-        agregarRegla("R'", ";", "e");
-        agregarRegla("R'", ",", "e");
-        agregarRegla("R'", "id", "e");
-        agregarRegla("R'", "if", "e");
-        agregarRegla("R'", "else", "e");
-        agregarRegla("R'", "endif", "e");
-        agregarRegla("R'", "finprograma", "e");
-        agregarRegla("R'", "var", "e");
-
-     // --- 14. E (Expresiones Aritméticas) ---
-        String inicioE = "T E'";
-        agregarRegla("E", "id", inicioE);
-        agregarRegla("E", "num", inicioE);
-        agregarRegla("E", "(", inicioE);
-        agregarRegla("E", "--", inicioE);
-        agregarRegla("E", "++", inicioE);
-
-        // --- 15. E' (Suma/Resta) ---
-        agregarRegla("E'", "+", "+ T E'");
-        agregarRegla("E'", "-", "- T E'");
-        
-        agregarRegla("E'", "<", "e");
-        agregarRegla("E'", ">", "e");
-        agregarRegla("E'", ">=", "e");
-        agregarRegla("E'", "<=", "e");
-        agregarRegla("E'", "==", "e");
-        agregarRegla("E'", "!=", "e");
-        agregarRegla("E'", "&&", "e");
-        agregarRegla("E'", "||", "e");
-        agregarRegla("E'", ")", "e");
-        agregarRegla("E'", ";", "e");
-        agregarRegla("E'", ",", "e");
-        agregarRegla("E'", "id", "e");
-        agregarRegla("E'", "if", "e");
-        agregarRegla("E'", "else", "e");
-        agregarRegla("E'", "endif", "e");
-        agregarRegla("E'", "finprograma", "e");
-        agregarRegla("E'", "var", "e");
-
-     // --- 16. T (Término) ---
-        String inicioT = "F T'";
-        agregarRegla("T", "id", inicioT);
-        agregarRegla("T", "num", inicioT);
-        agregarRegla("T", "(", inicioT);
-        agregarRegla("T", "--", inicioT);
-        agregarRegla("T", "++", inicioT);
-
-        // --- 17. T' (Mult/Div) ---
-        agregarRegla("T'", "*", "* F T'");
-        agregarRegla("T'", "/", "/ F T'");
-        
-        agregarRegla("T'", "+", "e");
-        agregarRegla("T'", "-", "e");
-        agregarRegla("T'", "<", "e");
-        agregarRegla("T'", ">", "e");
-        agregarRegla("T'", ">=", "e");
-        agregarRegla("T'", "<=", "e");
-        agregarRegla("T'", "==", "e");
-        agregarRegla("T'", "!=", "e");
-        agregarRegla("T'", "&&", "e");
-        agregarRegla("T'", "||", "e");
-        agregarRegla("T'", ")", "e");
-        agregarRegla("T'", ";", "e");
-        agregarRegla("T'", ",", "e");
-        agregarRegla("T'", "id", "e");
-        agregarRegla("T'", "if", "e");
-        agregarRegla("T'", "else", "e");
-        agregarRegla("T'", "endif", "e");
-        agregarRegla("T'", "finprograma", "e");
-        agregarRegla("T'", "var", "e");
-        
-        // F 
-        agregarRegla("F", "id", "id");
-        agregarRegla("F", "num", "num");
-        agregarRegla("F", "litcad", "litcad");
-        agregarRegla("F", "true", "true");
-        agregarRegla("F", "false", "false");
-        agregarRegla("F", "(", "( EL )");
-        agregarRegla("F", "--", "-- F");
-        agregarRegla("F", "++", "++ F");
-    }
-
-    private void agregarRegla(String noTerminal, String terminal, String produccion) {
-        tasp.computeIfAbsent(noTerminal, k -> new HashMap<>());
-        tasp.get(noTerminal).put(terminal, produccion);
-    }
-
-    // --- ALGORITMO DE ANÁLISIS ---
-    public List<PasoAnalisis> analizar(List<Token> tokens) {
-        bitacora.clear();
-        pila.clear();
-        
-        pila.push("$"); 
-        pila.push("Prog"); 
-
-        int indiceToken = 0;
-        Token tokenActual = tokens.get(indiceToken);
-
-        while (!pila.isEmpty()) {
-            String tope = pila.peek();
-            String entrada = tokenActual.getComponenteSintactico();
-            String pilaString = pila.toString(); 
-            
-            if (tope.equals("$") && entrada.equals("$")) {
-                bitacora.add(new PasoAnalisis("[$]", "$", "ACEPTACIÓN - CÓDIGO CORRECTO"));
-                break;
-            }
-
-            if (tope.equals(entrada)) {
-                bitacora.add(new PasoAnalisis(pilaString, entrada, "Match: " + tope));
-                pila.pop(); 
-                if (!tope.equals("$")) {
-                    indiceToken++;
-                    if (indiceToken < tokens.size()) tokenActual = tokens.get(indiceToken);
-                }
-            }
-            else if (esTerminal(tope)) {
-                bitacora.add(new PasoAnalisis(pilaString, entrada, "Error: Se esperaba " + tope));
-                FuncionesCompilador.agregarErrorSintactico("Se esperaba '" + tope + "' pero vino '" + entrada + "'", tokenActual.getLinea(), tokenActual.getColumna());
-                pila.pop(); 
-            }
-            else {
-                Map<String, String> fila = tasp.get(tope);
-                
-                if (fila != null && fila.containsKey(entrada)) {
-                    String produccion = fila.get(entrada);
-
-                    if (produccion.equals("saltar")) { 
-                        bitacora.add(new PasoAnalisis(pilaString, entrada, "Error (Saltar): Ignorando token " + entrada));
-                        FuncionesCompilador.agregarErrorSintactico("Token inesperado: " + entrada, tokenActual.getLinea(), tokenActual.getColumna());
-                        indiceToken++; 
-                        if (indiceToken < tokens.size()) tokenActual = tokens.get(indiceToken);
-                    } else if (produccion.equals("sacar")) { 
-                        bitacora.add(new PasoAnalisis(pilaString, entrada, "Error (Sacar): Extrayendo estructura " + tope));
-                        FuncionesCompilador.agregarErrorSintactico("Estructura incompleta para: " + tope, tokenActual.getLinea(), tokenActual.getColumna());
-                        pila.pop();
-                    } else if (produccion.equals("e")) { 
-                        bitacora.add(new PasoAnalisis(pilaString, entrada, tope + " -> epsilon"));
-                        pila.pop(); 
-                    } else { 
-                        bitacora.add(new PasoAnalisis(pilaString, entrada, tope + " -> " + produccion));
-                        pila.pop(); 
-                        String[] simbolos = produccion.split("\\s+");
-                        for (int i = simbolos.length - 1; i >= 0; i--) {
-                            if (!simbolos[i].isEmpty()) pila.push(simbolos[i]);
-                        }
-                    }
-                } else {
-                    bitacora.add(new PasoAnalisis(pilaString, entrada, "Error: No hay regla para [" + tope + ", " + entrada + "]"));
-                    FuncionesCompilador.agregarErrorSintactico("Sintaxis inválida cerca de: " + entrada, tokenActual.getLinea(), tokenActual.getColumna());
-                    indiceToken++; 
-                    if (indiceToken < tokens.size()) tokenActual = tokens.get(indiceToken);
-                }
+        matrizTASP = new String[vVariables.length][vTerminales.length];
+        for (int i = 0; i < vVariables.length; i++) {
+            for (int j = 0; j < vTerminales.length; j++) {
+                matrizTASP[i][j] = "sacar"; 
             }
         }
-        return bitacora;
+    }
+
+    private void inicializarMatriz() {
+        ag("Prog", "programa", "programa id ; Bloque finprograma");
+
+        ag("Bloque", "var", "Dec Bloque");
+        ag("Bloque", "id", "Sentencia Bloque");
+        ag("Bloque", "if", "Sentencia Bloque");
+        ag("Bloque", "leer", "Sentencia Bloque");
+        ag("Bloque", "escribir", "Sentencia Bloque");
+        ag("Bloque", "finprograma", "e");
+        ag("Bloque", "else", "e");
+        ag("Bloque", "endif", "e");
+
+
+        ag("Dec", "var", "var id Sigid : Tipo ;");
+
+        ag("Sigid", ",", ", id Sigid");
+        ag("Sigid", ":", "e");
+
+        ag("Tipo", "entero", "entero");
+        ag("Tipo", "real", "real");
+        ag("Tipo", "cadena", "cadena");
+        ag("Tipo", "bool", "bool");
+
+        ag("Sentencia", "id", "id = EL ;");
+        ag("Sentencia", "if", "if EL Bloque Sigif"); 
+        ag("Sentencia", "leer", "leer ( Lista_par ) ;");
+        ag("Sentencia", "escribir", "escribir ( Lista_par ) ;");
+
+
+        ag("Sigif", "else", "else Bloque endif");
+        ag("Sigif", "endif", "endif");
+
+        String inicioLista = "EL Sigpar";
+        ag("Lista_par", "id", inicioLista); ag("Lista_par", "num", inicioLista);
+        ag("Lista_par", "litcad", inicioLista); ag("Lista_par", "(", inicioLista);
+        ag("Lista_par", ")", "e");
+
+
+        ag("Sigpar", ",", ", EL Sigpar");
+        ag("Sigpar", ")", "e");
+
+        String inicioEL = "ER EL'";
+        ag("EL", "id", inicioEL); ag("EL", "num", inicioEL);
+        ag("EL", "litcad", inicioEL); ag("EL", "true", inicioEL);
+        ag("EL", "false", inicioEL); ag("EL", "(", inicioEL);
+        ag("EL", "!", "! EL"); ag("EL", "--", inicioEL); ag("EL", "++", inicioEL);
+
+        ag("EL'", "&&", "&& ER EL'"); ag("EL'", "||", "|| ER EL'");
+        agFollows("EL'", ")", ";", ",", "else", "endif", "finprograma", "id", "if", "var", "leer", "escribir");
+
+        // 12. ER
+        String inicioER = "E R'";
+        ag("ER", "id", inicioER); ag("ER", "num", inicioER);
+        ag("ER", "(", inicioER); ag("ER", "--", inicioER); ag("ER", "++", inicioER);
+        ag("ER", "true", "true R'"); ag("ER", "false", "false R'"); ag("ER", "litcad", "litcad R'");
+
+        ag("R'", "<", "< E"); ag("R'", ">", "> E");
+        ag("R'", ">=", ">= E"); ag("R'", "<=", "<= E");
+        ag("R'", "==", "== E"); ag("R'", "!=", "!= E");
+        agFollows("R'", "&&", "||", ")", ";", ",", "else", "endif", "finprograma", "id", "if", "var", "leer", "escribir");
+
+        String inicioE = "T E'";
+        ag("E", "id", inicioE); ag("E", "num", inicioE);
+        ag("E", "(", inicioE); ag("E", "--", inicioE); ag("E", "++", inicioE);
+
+        ag("E'", "+", "+ T E'"); ag("E'", "-", "- T E'");
+        agFollows("E'", "<", ">", ">=", "<=", "==", "!=", "&&", "||", ")", ";", ",", "else", 
+        		"endif", "finprograma", "id", "if", "var", "leer", "escribir");
+
+        String inicioT = "F T'";
+        ag("T", "id", inicioT); ag("T", "num", inicioT);
+        ag("T", "(", inicioT); ag("T", "--", inicioT); ag("T", "++", inicioT);
+
+        ag("T'", "*", "* F T'"); ag("T'", "/", "/ F T'");
+        agFollows("T'", "+", "-", "<", ">", ">=", "<=", "==", "!=", "&&", "||", ")", ";", ",", "else",
+        		"endif", "finprograma", "id", "if", "var", "leer", "escribir");
+
+        ag("F", "id", "id"); ag("F", "num", "num");
+        ag("F", "litcad", "litcad"); ag("F", "true", "true");
+        ag("F", "false", "false"); ag("F", "(", "( EL )");
+        ag("F", "--", "-- F"); ag("F", "++", "++ F");
+    }
+
+    private int buscarIndice(String[] vector, String busqueda) {
+        for (int i = 0; i < vector.length; i++) {
+            if (vector[i].equals(busqueda)) return i;
+        }
+        return -1;
+    }
+
+    private void ag(String noTerminal, String terminal, String produccion) {
+        int fila = buscarIndice(vVariables, noTerminal);
+        int col = buscarIndice(vTerminales, terminal);
+        if (fila != -1 && col != -1) {
+            matrizTASP[fila][col] = produccion;
+        }
+    }
+
+    private void agFollows(String noTerminal, String... terminales) {
+        for (String t : terminales) ag(noTerminal, t, "e");
+    }
+
+    private boolean esVariable(String simbolo) {
+        return buscarIndice(vVariables, simbolo) != -1;
     }
 
     private boolean esTerminal(String simbolo) {
-        return !tasp.containsKey(simbolo);
+        return buscarIndice(vTerminales, simbolo) != -1;
+    }
+
+    public List<PasoAnalisis> analizar(List<Token> tokens) {
+        bitacora.clear();
+        pila.clear();
+        pilaAux.clear();
+
+        pila.push("$");
+        pila.push("Prog"); 
+
+        int iToken = 0;
+        Token tokenActual = (tokens.isEmpty()) ? new Token(null, "$", 0, 0) : tokens.get(0);
+
+        while (!pila.isEmpty()) {
+            String X = pila.peek(); 
+            String a = tokenActual.getComponenteSintactico();
+            String pilaStr = pila.toString();
+            String pilaAuxStr = pilaAux.toString();
+
+            if (esVariable(X)) {
+                int fila = buscarIndice(vVariables, X);
+                int col = buscarIndice(vTerminales, a);
+
+                if (col == -1) {
+                     bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, "Error: Token desconocido " + a));
+                     FuncionesCompilador.agregarErrorSintactico("Token inválido: " + a, tokenActual.getLinea(), tokenActual.getColumna());
+                     iToken++;
+                     if (iToken < tokens.size()) tokenActual = tokens.get(iToken);
+                     continue;
+                }
+
+                String produccion = matrizTASP[fila][col];
+
+                if (produccion.equals("sacar")) {
+                    bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, "Error (Sacar): " + X));
+                    // NO AGREGAMOS ERROR A LA LISTA, SOLO LO REGISTRAMOS EN BITACORA
+                    // PARA QUE EL PARSER INTENTE RECUPERARSE
+                    pila.pop(); 
+                } else if (produccion.equals("saltar")) {
+                    bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, "Error (Saltar): " + a));
+                    FuncionesCompilador.agregarErrorSintactico("Token inesperado: " + a, tokenActual.getLinea(), tokenActual.getColumna());
+                    iToken++;
+                    if (iToken < tokens.size()) tokenActual = tokens.get(iToken);
+                } else if (produccion.equals("e")) {
+                    bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, X + " -> epsilon"));
+                    pila.pop();
+                } else {
+                    String[] simbolos = produccion.split("\\s+");
+                    for (String s : simbolos) if (!s.isEmpty()) pilaAux.push(s);
+                    bitacora.add(new PasoAnalisis(pilaStr, pilaAux.toString(), a, X + " -> " + produccion));
+                    pila.pop(); 
+                    while(!pilaAux.isEmpty()) pila.push(pilaAux.pop());
+                }
+            } 
+            else if (esTerminal(X) || X.equals("$")) {
+                if (X.equals(a)) {
+                    if (X.equals("$")) {
+                        bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, "ACEPTACIÓN"));
+                        break;
+                    }
+                    bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, "Concuerda: " + a));
+                    pila.pop();
+                    iToken++;
+                    if (iToken < tokens.size()) tokenActual = tokens.get(iToken);
+                } else {
+                    bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, "Error: Se esperaba " + X));
+                    FuncionesCompilador.agregarErrorSintactico("Se esperaba '" + X + "' pero vino '" + a + "'", tokenActual.getLinea(), tokenActual.getColumna());
+                    pila.pop(); 
+                }
+            } 
+            else {
+                bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, "Error Fatal: " + X));
+                pila.pop();
+            }
+        }
+        return bitacora;
     }
 }

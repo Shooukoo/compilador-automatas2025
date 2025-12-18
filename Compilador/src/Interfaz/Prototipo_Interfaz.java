@@ -17,10 +17,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
-/**
- * Clase principal de la interfaz gráfica del prototipo de compilador.
- * Actualizada para conectar el Análisis Sintáctico (Pila).
- */
 public class Prototipo_Interfaz extends JFrame implements ActionListener {
 
     private static final long serialVersionUID = 1L;
@@ -35,12 +31,7 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (Exception e) {
-                    System.err.println("No se pudo establecer el Look and Feel del sistema.");
-                }
-
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 Prototipo_Interfaz frame = new Prototipo_Interfaz();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
@@ -67,9 +58,8 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         setJMenuBar(menuBar);
         menuBar.add(crearMenu("Archivo", "Nuevo", "Abrir", "Guardar", "Salir"));
         menuBar.add(crearMenu("Editar", "Copiar", "Pegar", "Deshacer", "Rehacer"));
-        menuBar.add(crearMenu("Análisis", "Analizador Léxico", "Analizador Sintáctico"));
+        menuBar.add(crearMenu("Ejecutar", "Compilar")); 
 
-        // --- BARRA DE HERRAMIENTAS ---
         JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(false);
         toolBar.setRollover(true);
@@ -79,8 +69,8 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         toolBar.add(crearBotonConIcono("Abrir", "Archivo>Abrir", "/Interfaz/Iconos/abrir.png"));
         toolBar.add(crearBotonConIcono("Guardar", "Archivo>Guardar", "/Interfaz/Iconos/guardar.png"));
         toolBar.add(crearSeparadorPuntos());
-        toolBar.add(crearBotonConIcono("Léxico", "Análisis>Analizador Léxico", "/Interfaz/Iconos/lexico.png")); 
-        toolBar.add(crearBotonConIcono("Sintáctico", "Análisis>Analizador Sintáctico", "/Interfaz/Iconos/sintactico.png"));
+        toolBar.add(crearBotonConIcono("Compilar Código", "Ejecutar>Compilar", "/Interfaz/Iconos/jugar.png")); 
+        
         contentPane.add(toolBar, BorderLayout.NORTH);
 
         // --- Área Central ---
@@ -94,20 +84,19 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         JPanel panelLexico = new JPanel(new BorderLayout());
         tablaLexico = new JTable();
         tablaLexico.setFillsViewportHeight(true);
-        tablaLexico.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        tablaLexico.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         JScrollPane scrollLexico = new JScrollPane(tablaLexico);
         panelLexico.add(scrollLexico, BorderLayout.CENTER);
-        panelLexico.setBorder(BorderFactory.createTitledBorder("Análisis Léxico"));
+        panelLexico.setBorder(BorderFactory.createTitledBorder("Léxico"));
 
         // Panel Sintáctico
         JPanel panelSintactico = new JPanel(new BorderLayout());
         tablaSintactico = new JTable();
         tablaSintactico.setFillsViewportHeight(true);
-        // Quitamos el auto-resize para que la columna de PILA se vea bien ancha
         tablaSintactico.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); 
         JScrollPane scrollSintactico = new JScrollPane(tablaSintactico);
         panelSintactico.add(scrollSintactico, BorderLayout.CENTER);
-        panelSintactico.setBorder(BorderFactory.createTitledBorder("Análisis Sintáctico (Pila)"));
+        panelSintactico.setBorder(BorderFactory.createTitledBorder("Sintáctico"));
         
         panelDerecho.setTopComponent(panelLexico);
         panelDerecho.setBottomComponent(panelSintactico);
@@ -120,7 +109,7 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
 
         // --- Consola ---
         JPanel panelInferior = new JPanel(new BorderLayout());
-        panelInferior.setBorder(BorderFactory.createTitledBorder("Consola de Errores y Mensajes"));
+        panelInferior.setBorder(BorderFactory.createTitledBorder("Consola de Salida"));
         consolaErrores = new JTextArea();
         consolaErrores.setEditable(false);
         consolaErrores.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -137,7 +126,119 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         tabbedPane.addChangeListener(e -> actualizarTituloVentana());
     }
 
-    // --- MÉTODOS DE CREACIÓN DE UI ---
+    private void compilarTodo(String codigoFuente) {
+        limpiarConsola();
+        tablaLexico.setModel(new DefaultTableModel());
+        tablaSintactico.setModel(new DefaultTableModel());
+        
+        consolaErrores.append("Iniciando compilación...\n");
+
+        List<Token> tokens = FuncionesCompilador.obtenerTokens(codigoFuente);
+        llenarTablaLexica(tokens);
+        consolaErrores.append("Análisis Léxico completado.\n");
+
+        AnalizadorSintactico parser = new AnalizadorSintactico();
+        List<AnalizadorSintactico.PasoAnalisis> pasos = parser.analizar(tokens);
+        llenarTablaSintactica(pasos);
+        consolaErrores.append("Análisis Sintáctico completado.\n");
+
+        List<ErrorCompilador> errores = FuncionesCompilador.getErrores();
+        
+        consolaErrores.append("--------------------------------------------------\n");
+        if (errores.isEmpty()) {
+            consolaErrores.setForeground(new Color(0, 100, 0));
+            consolaErrores.append("RESULTADO: ¡COMPILACIÓN EXITOSA! 0 ERRORES.\n");
+        } else {
+            consolaErrores.setForeground(Color.RED);
+            consolaErrores.append("RESULTADO: FALLÓ LA COMPILACIÓN.\n");
+            consolaErrores.append("Se encontraron " + errores.size() + " errores:\n\n");
+            for (ErrorCompilador err : errores) {
+                consolaErrores.append(" > " + err.toString() + "\n");
+            }
+        }
+        consolaErrores.append("--------------------------------------------------\n");
+    }
+
+    private void llenarTablaLexica(List<Token> tokens) {
+        // CAMBIO: Se eliminó la columna "Línea", solo queda "Token"
+        String[] columnas = {"Token"};
+        
+        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
+             @Override public boolean isCellEditable(int row, int col) { return false; }
+        };
+
+        for (Token t : tokens) {
+            if (!t.getComponenteSintactico().equals("$")) {
+                Object[] fila = {
+                    t.getComponenteSintactico()
+                };
+                model.addRow(fila);
+            }
+        }
+        tablaLexico.setModel(model);
+    }
+
+    private void llenarTablaSintactica(List<AnalizadorSintactico.PasoAnalisis> pasos) {
+        String[] columnas = {"Pila Principal", "Pila Aux", "Entrada", "Acción"};
+        
+        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
+             @Override public boolean isCellEditable(int row, int col) { return false; }
+        };
+
+        for (AnalizadorSintactico.PasoAnalisis p : pasos) {
+            model.addRow(new Object[]{p.pilaPrincipal, p.pilaAux, p.entrada, p.accion});
+        }
+        
+        tablaSintactico.setModel(model);
+        tablaSintactico.getColumnModel().getColumn(0).setPreferredWidth(300); 
+        tablaSintactico.getColumnModel().getColumn(1).setPreferredWidth(150); 
+        tablaSintactico.getColumnModel().getColumn(2).setPreferredWidth(100); 
+        tablaSintactico.getColumnModel().getColumn(3).setPreferredWidth(200); 
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String comando = e.getActionCommand();
+        JTextArea editor = getEditorActivo();
+
+        switch (comando) {
+            case "Archivo>Nuevo":
+                agregarNuevaPestana("Sin título " + (tabbedPane.getTabCount() + 1), crearNuevoEditor(), null);
+                break;
+            case "Archivo>Abrir":
+                String contenido = FuncionesCompilador.abrirArchivo(this);
+                if (contenido != null) {
+                    File f = FuncionesCompilador.getArchivoActual();
+                    for(int i=0; i < tabbedPane.getTabCount(); i++){
+                        File openF = (File)((JScrollPane)tabbedPane.getComponentAt(i)).getClientProperty("archivo");
+                        if(openF != null && openF.equals(f)){ tabbedPane.setSelectedIndex(i); return; }
+                    }
+                    JTextArea newEd = crearNuevoEditor();
+                    newEd.setText(contenido);
+                    agregarNuevaPestana(f.getName(), newEd, f);
+                    newEd.setCaretPosition(0);
+                    FuncionesCompilador.getUndoManager().discardAllEdits();
+                }
+                break;
+            case "Archivo>Guardar": guardarArchivoActual(); break;
+            case "Archivo>Salir": System.exit(0); break;
+            case "Editar>Copiar": if (editor != null) editor.copy(); break;
+            case "Editar>Pegar": if (editor != null) editor.paste(); break;
+            case "Editar>Deshacer": FuncionesCompilador.deshacer(); break;
+            case "Editar>Rehacer": FuncionesCompilador.rehacer(); break;
+            
+            case "Ejecutar>Compilar":
+                if (editor != null) {
+                    compilarTodo(editor.getText());
+                } else {
+                    limpiarConsola();
+                    consolaErrores.setText("No hay código para compilar.");
+                }
+                break;
+        }
+    }
+
+    private void limpiarConsola() { consolaErrores.setText(""); }
 
     private JMenu crearMenu(String nombre, String... opciones) {
         JMenu menu = new JMenu(nombre);
@@ -194,12 +295,11 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         scrollPane.putClientProperty("modificado", Boolean.FALSE);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        // Requiere clase NumeroLinea (asegúrate de tenerla en el paquete Interfaz)
         try {
             NumeroLinea numeroLinea = new NumeroLinea(editor);
             scrollPane.setRowHeaderView(numeroLinea);
         } catch (Exception e) {
-            System.err.println("Clase NumeroLinea no encontrada, continuando sin ella.");
+            // Ignorar si no existe
         }
 
         editor.setMargin(new Insets(5, 5, 5, 5));
@@ -304,147 +404,6 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         return false;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String comando = e.getActionCommand();
-        JTextArea editor = getEditorActivo();
-
-        switch (comando) {
-            case "Archivo>Nuevo":
-                agregarNuevaPestana("Sin título " + (tabbedPane.getTabCount() + 1), crearNuevoEditor(), null);
-                break;
-            case "Archivo>Abrir":
-                String contenido = FuncionesCompilador.abrirArchivo(this);
-                if (contenido != null) {
-                    File f = FuncionesCompilador.getArchivoActual();
-                    for(int i=0; i < tabbedPane.getTabCount(); i++){
-                        File openF = (File)((JScrollPane)tabbedPane.getComponentAt(i)).getClientProperty("archivo");
-                        if(openF != null && openF.equals(f)){ tabbedPane.setSelectedIndex(i); return; }
-                    }
-                    JTextArea newEd = crearNuevoEditor();
-                    newEd.setText(contenido);
-                    agregarNuevaPestana(f.getName(), newEd, f);
-                    newEd.setCaretPosition(0);
-                    FuncionesCompilador.getUndoManager().discardAllEdits();
-                }
-                break;
-            case "Archivo>Guardar": guardarArchivoActual(); break;
-            case "Archivo>Salir": System.exit(0); break;
-            case "Editar>Copiar": if (editor != null) editor.copy(); break;
-            case "Editar>Pegar": if (editor != null) editor.paste(); break;
-            case "Editar>Deshacer": FuncionesCompilador.deshacer(); break;
-            case "Editar>Rehacer": FuncionesCompilador.rehacer(); break;
-            
-            // --- ANÁLISIS LÉXICO ---
-            case "Análisis>Analizador Léxico":
-                if (editor != null) mostrarResultadoAnalisisLexico(editor.getText());
-                else {
-                      limpiarConsola();
-                      consolaErrores.setText("No hay editor activo para analizar.");
-                }
-                break;
-
-            // --- ANÁLISIS SINTÁCTICO (CONECTADO) ---
-            case "Análisis>Analizador Sintáctico":
-                 if (editor != null) {
-                     mostrarResultadoAnalisisSintactico(editor.getText());
-                 } else {
-                     limpiarConsola();
-                     consolaErrores.setText("No hay editor activo para analizar.");
-                     tablaSintactico.setModel(new DefaultTableModel());
-                 }
-                break;
-        }
-    }
-
-    private void limpiarConsola() { consolaErrores.setText(""); }
-
-    // --- LÓGICA DE VISUALIZACIÓN LÉXICA ---
-    private void mostrarResultadoAnalisisLexico(String codigoFuente) {
-        List<Token> tokensValidos = FuncionesCompilador.obtenerTokens(codigoFuente);
-        List<ErrorCompilador> errores = FuncionesCompilador.getErrores();
-
-        limpiarConsola();
-        if (errores.isEmpty()) {
-            consolaErrores.setForeground(new Color(0, 100, 0));
-            consolaErrores.append("Análisis Léxico exitoso. Tokens generados: " + tokensValidos.size() + "\n");
-        } else {
-            consolaErrores.setForeground(Color.RED);
-            consolaErrores.append("Errores léxicos encontrados:\n");
-            for (ErrorCompilador err : errores) consolaErrores.append("  " + err.toString() + "\n");
-        }
-
-        String[] columnas = {"Lexema", "Categoría", "Componente TASP", "Línea", "Columna"};
-        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
-             @Override public boolean isCellEditable(int row, int col) { return false; }
-        };
-
-        for (Token t : tokensValidos) {
-            // No mostramos el token $ en la tabla léxica para no confundir,
-            // aunque internamente existe.
-            if (!t.getComponenteSintactico().equals("$")) {
-                Object[] fila = {
-                    t.getValor(),
-                    FuncionesCompilador.obtenerComponente(t.getTipo()),
-                    t.getComponenteSintactico(),
-                    (t.getLinea() == 0) ? "-" : t.getLinea(),
-                    (t.getColumna() == 0) ? "-" : t.getColumna()
-                };
-                model.addRow(fila);
-            }
-        }
-        tablaLexico.setModel(model);
-        tablaLexico.getColumnModel().getColumn(0).setPreferredWidth(100); 
-        tablaLexico.getColumnModel().getColumn(2).setPreferredWidth(100); 
-        
-        // Limpiamos la tabla sintáctica porque el léxico cambió
-        tablaSintactico.setModel(new DefaultTableModel());
-    }
-
-    private void mostrarResultadoAnalisisSintactico(String codigoFuente) {
-        // 1. Obtener Tokens
-        List<Token> tokens = FuncionesCompilador.obtenerTokens(codigoFuente);
-        
-        // 2. Instanciar el Analizador Sintáctico (Ya trae la tabla adentro)
-        AnalizadorSintactico parser = new AnalizadorSintactico();
-        
-        // --- YA NO NECESITAS cargarTASP(...) ---
-        // boolean cargado = parser.cargarTASP("TASP.csv"); 
-        
-        limpiarConsola();
-
-        // 3. Ejecutar Análisis
-        List<AnalizadorSintactico.PasoAnalisis> pasos = parser.analizar(tokens);
-        List<ErrorCompilador> errores = FuncionesCompilador.getErrores();
-
-        // 4. Mostrar Errores en Consola
-        if (errores.isEmpty()) {
-            consolaErrores.setForeground(new Color(0, 100, 0)); // Verde
-            consolaErrores.append("Análisis Sintáctico Exitoso: El código cumple con la gramática.\n");
-        } else {
-            consolaErrores.setForeground(Color.RED); // Rojo
-            consolaErrores.append("Se encontraron errores durante el análisis:\n");
-            for (ErrorCompilador err : errores) {
-                consolaErrores.append("  " + err.toString() + "\n");
-            }
-        }
-
-        // 5. Llenar la Tabla Visual
-        String[] columnas = {"Pila (Z al inicio)", "Entrada", "Acción"};
-        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
-             @Override public boolean isCellEditable(int row, int col) { return false; }
-        };
-
-        for (AnalizadorSintactico.PasoAnalisis p : pasos) {
-            model.addRow(new Object[]{p.pila, p.entrada, p.accion});
-        }
-        
-        tablaSintactico.setModel(model);
-        tablaSintactico.getColumnModel().getColumn(0).setPreferredWidth(400); 
-        tablaSintactico.getColumnModel().getColumn(1).setPreferredWidth(100); 
-        tablaSintactico.getColumnModel().getColumn(2).setPreferredWidth(250); 
-    }
-
     private JButton crearBotonConIcono(String tooltip, String comando, String rutaIcono) {
         JButton boton = new JButton();
         boton.setFocusable(false);
@@ -452,12 +411,10 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
         boton.addActionListener(this);
         boton.setToolTipText(tooltip);
         try {
-            // Ajustar ruta si es necesario según tu estructura de paquetes
             ImageIcon icon = new ImageIcon(getClass().getResource(rutaIcono));
             Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             boton.setIcon(new ImageIcon(img));
         } catch (Exception e) {
-            // Si falla el icono, ponemos texto simple
             boton.setText(tooltip.substring(0, 1));
         }
         return boton;
