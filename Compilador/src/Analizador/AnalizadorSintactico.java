@@ -114,7 +114,6 @@ public class AnalizadorSintactico {
         ag("EL'", "&&", "&& ER EL'"); ag("EL'", "||", "|| ER EL'");
         agFollows("EL'", ")", ";", ",", "else", "endif", "finprograma", "id", "if", "var", "leer", "escribir");
 
-        // 12. ER
         String inicioER = "E R'";
         ag("ER", "id", inicioER); ag("ER", "num", inicioER);
         ag("ER", "(", inicioER); ag("ER", "--", inicioER); ag("ER", "++", inicioER);
@@ -207,14 +206,7 @@ public class AnalizadorSintactico {
 
                 if (produccion.equals("sacar")) {
                     bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, "Error (Sacar): " + X));
-                    // NO AGREGAMOS ERROR A LA LISTA, SOLO LO REGISTRAMOS EN BITACORA
-                    // PARA QUE EL PARSER INTENTE RECUPERARSE
                     pila.pop(); 
-                } else if (produccion.equals("saltar")) {
-                    bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, "Error (Saltar): " + a));
-                    FuncionesCompilador.agregarErrorSintactico("Token inesperado: " + a, tokenActual.getLinea(), tokenActual.getColumna());
-                    iToken++;
-                    if (iToken < tokens.size()) tokenActual = tokens.get(iToken);
                 } else if (produccion.equals("e")) {
                     bitacora.add(new PasoAnalisis(pilaStr, pilaAuxStr, a, X + " -> epsilon"));
                     pila.pop();

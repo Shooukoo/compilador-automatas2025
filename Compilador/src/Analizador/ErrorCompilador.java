@@ -46,6 +46,6 @@ public class ErrorCompilador {
 
     @Override
     public String toString() {
-        return String.format("[%s] Línea %d, Columna %d: %s", tipo, linea, columna, descripcion);
+        return String.format("[%s] Línea %d, %s", tipo, linea, descripcion);
     }
 }
