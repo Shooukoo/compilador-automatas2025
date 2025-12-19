@@ -160,7 +160,6 @@ public class Prototipo_Interfaz extends JFrame implements ActionListener {
     }
 
     private void llenarTablaLexica(List<Token> tokens) {
-        // CAMBIO: Se eliminó la columna "Línea", solo queda "Token"
         String[] columnas = {"Token"};
         
         DefaultTableModel model = new DefaultTableModel(columnas, 0) {
