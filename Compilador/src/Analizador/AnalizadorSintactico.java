@@ -109,29 +109,31 @@ public class AnalizadorSintactico {
             {"entero"}, {"real"}, {"cadena"}, {"car"}, {"bool"}, 
             {"sacar"}
         },
-        // [5] Sentencia
+     // [5] Sentencia
         {
-            {"id", "=", "EL", ";"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"leer", "(", "Lista_par", ")", ";"}, {"escribir", "(", "Lista_par", ")", ";"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"if", "EL", "Bloque", "Sigif"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
+            /*id*/{"id", "=", "EL", ";"}, /*num*/{"sacar"}, /*litcad*/{"sacar"}, /*litcar*/{"sacar"}, /*true*/{"sacar"}, /*false*/{"sacar"}, 
+            /*leer*/{"leer", "(", "Lista_par", ")", ";"}, /*escribir*/{"escribir", "(", "Lista_par", ")", ";"}, 
+            /*(*/{"sacar"}, /*)*/{"sacar"}, /*+*/{"sacar"}, /*-*/{"sacar"}, /* */{"sacar"}, /*/*/{"sacar"}, /*!*/{"sacar"}, 
+            /*<*/{"sacar"}, /*>*/{"sacar"}, /*>=*/{"sacar"}, /*<=*/{"sacar"}, /*==*/{"sacar"}, /*!=*/{"sacar"}, /*||*/{"sacar"}, /*&&*/{"sacar"}, 
+            /*,*/{"sacar"}, /*:*/{"sacar"}, /*;*/{"sacar"}, /*=*/{"sacar"}, 
+            /*programa*/{"sacar"}, /*finprograma*/{"sacar"}, /*var*/{"sacar"}, 
+            // CAMBIO: if (...) Bloque Sigif
+            /*if*/{"if", "(", "EL", ")", "Bloque", "Sigif"}, /*else*/{"sacar"}, /*endif*/{"sacar"}, 
+            /*entero*/{"sacar"}, /*real*/{"sacar"}, /*cadena*/{"sacar"}, /*car*/{"sacar"}, /*bool*/{"sacar"}, 
+            /*$*/{"sacar"}
         },
         // [6] Sigif
         {
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"else", "Bloque", "endif"}, {"endif"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
+            /*id*/{"sacar"}, /*num*/{"sacar"}, /*litcad*/{"sacar"}, /*litcar*/{"sacar"}, /*true*/{"sacar"}, /*false*/{"sacar"}, 
+            /*leer*/{"sacar"}, /*escribir*/{"sacar"}, 
+            /*(*/{"sacar"}, /*)*/{"sacar"}, /*+*/{"sacar"}, /*-*/{"sacar"}, /* */{"sacar"}, /*/*/{"sacar"}, /*!*/{"sacar"}, 
+            /*<*/{"sacar"}, /*>*/{"sacar"}, /*>=*/{"sacar"}, /*<=*/{"sacar"}, /*==*/{"sacar"}, /*!=*/{"sacar"}, /*||*/{"sacar"}, /*&&*/{"sacar"}, 
+            /*,*/{"sacar"}, /*:*/{"sacar"}, /*;*/{"sacar"}, /*=*/{"sacar"}, 
+            /*programa*/{"sacar"}, /*finprograma*/{"sacar"}, /*var*/{"sacar"}, 
+            // CAMBIO: else Bloque endif (para permitir múltiples líneas) O solo endif
+            /*if*/{"sacar"}, /*else*/{"else", "Bloque", "endif"}, /*endif*/{"endif"}, 
+            /*entero*/{"sacar"}, /*real*/{"sacar"}, /*cadena*/{"sacar"}, /*car*/{"sacar"}, /*bool*/{"sacar"}, 
+            /*$*/{"sacar"}
         },
         // [7] Lista_par
         {
