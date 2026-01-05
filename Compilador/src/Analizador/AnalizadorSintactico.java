@@ -43,205 +43,223 @@ public class AnalizadorSintactico {
     };
 
     private static final String[][][] TABLA = {
-        {
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"programa", "id", ";", "Bloque", "finprograma"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"sacar"}
-        },
-        {
-            {"Sentencia", "Bloque"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"Sentencia", "Bloque"}, {"Sentencia", "Bloque"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"e"}, {"Dec", "Bloque"}, 
-            {"Sentencia", "Bloque"}, {"e"}, {"e"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"sacar"}
-        },
-        {
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"var", "id", "Sigid", ":", "Tipo", ";"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"sacar"}
-        },
-        {
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {",", "id", "Sigid"}, {"e"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
-            {"sacar"}
-        },
-        {
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"entero"}, {"real"}, {"cadena"}, {"car"}, {"bool"}, 
-            {"sacar"}
-        },
-        {
-            {"id", "=", "EL", ";"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"leer", "(", "Lista_par", ")", ";"}, {"escribir", "(", "Lista_par", ")", ";"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"if", "EL", "Bloque", "Sigif"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"else", "Bloque", "endif"}, {"endif"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"EL", "Sigpar"}, {"EL", "Sigpar"}, {"EL", "Sigpar"}, {"EL", "Sigpar"}, {"EL", "Sigpar"}, {"EL", "Sigpar"}, 
-            {"sacar"}, {"sacar"}, 
-            {"EL", "Sigpar"}, {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {",", "EL", "Sigpar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"ER", "EL'"}, {"ER", "EL'"}, {"ER", "EL'"}, {"ER", "EL'"}, {"ER", "EL'"}, {"ER", "EL'"}, 
-            {"sacar"}, {"sacar"}, 
-            {"ER", "EL'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"!", "EL"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"e"}, {"e"}, 
-            {"sacar"}, {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"||", "ER", "EL'"}, {"&&", "ER", "EL'"}, 
-            {"e"}, {"sacar"}, {"e"}, {"sacar"}, 
-            {"sacar"}, {"e"}, {"e"}, 
-            {"e"}, {"e"}, {"e"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"E", "R'"}, {"E", "R'"}, {"litcad", "R'"}, {"litcar", "R'"}, {"true", "R'"}, {"false", "R'"}, 
-            {"sacar"}, {"sacar"}, 
-            {"E", "R'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"e"}, {"e"}, 
-            {"sacar"}, {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"<", "E"}, {">", "E"}, {">=", "E"}, {"<=", "E"}, {"==", "E"}, {"!=", "E"}, {"e"}, {"e"}, 
-            {"e"}, {"sacar"}, {"e"}, {"sacar"}, 
-            {"sacar"}, {"e"}, {"e"}, 
-            {"e"}, {"e"}, {"e"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"T", "E'"}, {"T", "E'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, 
-            {"T", "E'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"e"}, {"e"}, 
-            {"sacar"}, {"e"}, {"+", "T", "E'"}, {"-", "T", "E'"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, 
-            {"e"}, {"sacar"}, {"e"}, {"sacar"}, 
-            {"sacar"}, {"e"}, {"e"}, 
-            {"e"}, {"e"}, {"e"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"F", "T'"}, {"F", "T'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, 
-            {"F", "T'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"e"}, {"e"}, 
-            {"sacar"}, {"e"}, {"e"}, {"e"}, {"*", "F", "T'"}, {"/", "F", "T'"}, {"sacar"}, 
-            {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, 
-            {"e"}, {"sacar"}, {"e"}, {"sacar"}, 
-            {"sacar"}, {"e"}, {"e"}, 
-            {"e"}, {"e"}, {"e"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        },
-        {
-            {"id"}, {"num"}, {"litcad"}, {"litcar"}, {"true"}, {"false"}, 
-            {"sacar"}, {"sacar"}, 
-            {"(", "EL", ")"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
-            {"sacar"}
-        }
-    };
+            // [0] Prog
+            {
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"programa", "id", ";", "Bloque", "finprograma"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"sacar"}
+            },
+            // [1] Bloque
+            {
+                {"Sentencia", "Bloque"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"Sentencia", "Bloque"}, {"Sentencia", "Bloque"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"e"}, {"Dec", "Bloque"}, 
+                {"Sentencia", "Bloque"}, {"e"}, {"e"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"sacar"}
+            },
+            // [2] Dec
+            {
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"var", "id", "Sigid", ":", "Tipo", ";"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"sacar"}
+            },
+            // [3] Sigid
+            {
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {",", "id", "Sigid"}, {"e"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, {"saltar"}, 
+                {"sacar"}
+            },
+            // [4] Tipo
+            {
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"entero"}, {"real"}, {"cadena"}, {"car"}, {"bool"}, 
+                {"sacar"}
+            },
+            // [5] Sentencia
+            {
+                {"id", "=", "EL", ";"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"leer", "(", "Lista_par", ")", ";"}, {"escribir", "(", "Lista_par", ")", ";"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"if", "EL", "Bloque", "Sigif"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [6] Sigif
+            {
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"else", "Bloque", "endif"}, {"endif"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [7] Lista_par
+            {
+                {"EL", "Sigpar"}, {"EL", "Sigpar"}, {"EL", "Sigpar"}, {"EL", "Sigpar"}, {"EL", "Sigpar"}, {"EL", "Sigpar"}, 
+                {"sacar"}, {"sacar"}, 
+                {"EL", "Sigpar"}, {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [8] Sigpar
+            {
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {",", "EL", "Sigpar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [9] EL
+            {
+                {"ER", "EL'"}, {"ER", "EL'"}, {"ER", "EL'"}, {"ER", "EL'"}, {"ER", "EL'"}, {"ER", "EL'"}, 
+                {"sacar"}, {"sacar"}, 
+                {"ER", "EL'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"!", "EL"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [10] EL'
+            {
+                {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"e"}, {"e"}, 
+                {"sacar"}, {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"||", "ER", "EL'"}, {"&&", "ER", "EL'"}, 
+                {"e"}, {"sacar"}, {"e"}, {"sacar"}, 
+                {"sacar"}, {"e"}, {"e"}, 
+                {"e"}, {"e"}, {"e"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [11] ER
+            {
+                {"E", "R'"}, {"E", "R'"}, {"litcad", "R'"}, {"litcar", "R'"}, {"true", "R'"}, {"false", "R'"}, 
+                {"sacar"}, {"sacar"}, 
+                {"E", "R'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [12] R'
+            {
+                {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"e"}, {"e"}, 
+                {"sacar"}, {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"<", "E"}, {">", "E"}, {">=", "E"}, {"<=", "E"}, {"==", "E"}, {"!=", "E"}, {"e"}, {"e"}, 
+                {"e"}, {"sacar"}, {"e"}, {"sacar"}, 
+                {"sacar"}, {"e"}, {"e"}, 
+                {"e"}, {"e"}, {"e"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [13] E
+            {
+                {"T", "E'"}, {"T", "E'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, 
+                {"T", "E'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [14] E'
+            {
+                {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"e"}, {"e"}, 
+                {"sacar"}, {"e"}, {"+", "T", "E'"}, {"-", "T", "E'"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, 
+                {"e"}, {"sacar"}, {"e"}, {"sacar"}, 
+                {"sacar"}, {"e"}, {"e"}, 
+                {"e"}, {"e"}, {"e"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [15] T
+            {
+                {"F", "T'"}, {"F", "T'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, 
+                {"F", "T'"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [16] T'
+            {
+                {"e"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"e"}, {"e"}, 
+                {"sacar"}, {"e"}, {"e"}, {"e"}, {"*", "F", "T'"}, {"/", "F", "T'"}, {"sacar"}, 
+                {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, {"e"}, 
+                {"e"}, {"sacar"}, {"e"}, {"sacar"}, 
+                {"sacar"}, {"e"}, {"e"}, 
+                {"e"}, {"e"}, {"e"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            },
+            // [17] F
+            {
+                {"id"}, {"num"}, {"litcad"}, {"litcar"}, {"true"}, {"false"}, 
+                {"sacar"}, {"sacar"}, 
+                {"(", "EL", ")"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, {"sacar"}, 
+                {"sacar"}
+            }
+        };
 
     public AnalizadorSintactico() {
         this.bitacora = new ArrayList<>();

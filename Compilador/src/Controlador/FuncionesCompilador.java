@@ -11,7 +11,7 @@ import Analizador.Token;
 import Analizador.AnalizadorLexico;
 import Analizador.TokenType;
 import Analizador.ErrorCompilador;
-import Analizador.AnalizadorSintactico; // Importamos la nueva clase
+import Analizador.AnalizadorSintactico;
 
 public class FuncionesCompilador {
 
